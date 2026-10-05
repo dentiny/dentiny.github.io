@@ -1,0 +1,37 @@
+title: dentiny 的博客
+description: 记录、思考，与生活中的小发现。
+author: dentiny
+url: https://dentiny.github.io
+baseurl: ""
+lang: zh-CN
+timezone: America/Los_Angeles
+permalink: /posts/:title/
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+feed:
+  path: feed.xml
+excerpt_separator: "<!--more-->"
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
+  - scope:
+      path: ""
+    values:
+      layout: default
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - .bundle
+  - scripts

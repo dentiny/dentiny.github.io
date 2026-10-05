@@ -1,0 +1,21 @@
+---
+layout: default
+---
+<section class="hero" aria-labelledby="hero-title">
+  <div class="eyebrow"><span class="small-dot" aria-hidden="true"></span> 文字 · 想法 · 日常</div>
+  <h1 id="hero-title">把想法写下来。<br><span>让思考慢慢生长。</span></h1>
+  <p>一些记录，一些思考，还有沿途的小发现。<br>欢迎来到我的博客。</p>
+  <a class="text-link" href="#latest">开始阅读 <span aria-hidden="true">↓</span></a>
+  <div class="hero-note" aria-hidden="true">A SPACE FOR<br>THOUGHTS &amp; WORDS</div>
+</section>
+<section class="latest" id="latest" aria-labelledby="latest-title">
+  <div class="section-heading"><h2 id="latest-title">最近的文字<span class="section-caption">LATEST NOTES</span></h2><a href="{{ '/archive/' | relative_url }}">全部文章 <span aria-hidden="true">↗</span></a></div>
+  {% for post in site.posts limit: 6 %}
+  <article class="post-card">
+    <div class="post-meta"><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: '%Y.%m.%d' }}</time>{% for tag in post.tags %}<span>{{ tag | escape }}</span>{% endfor %}</div>
+    <h3><a href="{{ post.url | relative_url }}">{{ post.title | escape }}<span class="card-arrow" aria-hidden="true">↗</span></a></h3>
+    <p>{{ post.description | default: post.excerpt | strip_html | normalize_whitespace | truncate: 130 | escape }}</p>
+  </article>
+  {% else %}<p class="empty-state">第一篇文章正在路上。</p>{% endfor %}
+</section>
+<aside class="home-note"><span aria-hidden="true">✳</span><p>写下来，是为了更好地记住，<br>也是为了更清楚地理解。</p><a href="{{ '/about/' | relative_url }}">关于这个博客 <span aria-hidden="true">↗</span></a></aside>
