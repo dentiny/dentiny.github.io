@@ -2,15 +2,16 @@
 layout: default
 ---
 <article class="post-page">
-  <a class="back-link" href="{{ '/archive/' | relative_url }}"><span aria-hidden="true">←</span> 全部文章</a>
-  <header class="article-header">
-    <div class="post-meta"><time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%Y.%m.%d' }}</time>{% for tag in page.tags %}<span>{{ tag | escape }}</span>{% endfor %}</div>
+  <a class="back-link" href="{{ '/archive/' | relative_url }}">← All posts</a>
+  <header class="page-header">
+    <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%b %-d, %Y' }}</time>
     <h1>{{ page.title | escape }}</h1>
-    {% if page.description %}<p class="article-description">{{ page.description | escape }}</p>{% endif %}
   </header>
   <div class="prose">{{ content }}</div>
-  <nav class="post-navigation" aria-label="相邻文章">
-    {% if page.previous %}<a href="{{ page.previous.url | relative_url }}"><span>← 上一篇</span>{{ page.previous.title | escape }}</a>{% endif %}
-    {% if page.next %}<a href="{{ page.next.url | relative_url }}"><span>下一篇 →</span>{{ page.next.title | escape }}</a>{% endif %}
+  {% if page.previous or page.next %}
+  <nav class="post-navigation" aria-label="Adjacent posts">
+    {% if page.previous %}<a href="{{ page.previous.url | relative_url }}">← {{ page.previous.title | escape }}</a>{% endif %}
+    {% if page.next %}<a href="{{ page.next.url | relative_url }}">{{ page.next.title | escape }} →</a>{% endif %}
   </nav>
+  {% endif %}
 </article>

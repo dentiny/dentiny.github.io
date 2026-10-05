@@ -1,9 +1,9 @@
-title: dentiny 的博客
-description: 记录、思考，与生活中的小发现。
+title: dentiny
+description: Notes, ideas, and things I learn.
 author: dentiny
 url: https://dentiny.github.io
 baseurl: ""
-lang: zh-CN
+lang: en
 timezone: America/Los_Angeles
 permalink: /posts/:title/
 markdown: kramdown

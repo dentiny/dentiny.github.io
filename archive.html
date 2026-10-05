@@ -1,19 +1,21 @@
 ---
 layout: default
-title: 全部文章
+title: Posts
 permalink: /archive/
-description: 所有文字，按时间排列。
+description: All posts, newest first.
 ---
 <section class="archive-page" aria-labelledby="archive-title">
-  <header class="page-header"><div class="eyebrow">THE ARCHIVE</div><h1 id="archive-title">全部文章<span class="article-count">{{ site.posts | size }}</span></h1><p>所有文字，按时间排列。</p></header>
-  <div class="search-box" hidden><label for="article-search">查找文章</label><input id="article-search" type="search" placeholder="输入标题或标签…" autocomplete="off"></div>
+  <header class="page-header"><h1 id="archive-title">Posts</h1></header>
   {% assign posts_by_year = site.posts | group_by_exp: 'post', "post.date | date: '%Y'" %}
   {% for year in posts_by_year %}
-  <section class="archive-year" aria-labelledby="year-{{ year.name }}"><h2 id="year-{{ year.name }}">{{ year.name }}</h2><div>
+  <section class="archive-year" aria-labelledby="year-{{ year.name }}">
+    <h2 id="year-{{ year.name }}">{{ year.name }}</h2>
     {% for post in year.items %}
-    <article class="archive-entry" data-search="{{ post.title | append: ' ' | append: post.tags | escape }}"><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: '%m.%d' }}</time><div><h3><a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a></h3><p>{% for tag in post.tags %}<span>{{ tag | escape }}</span>{% endfor %}</p></div><span class="entry-arrow" aria-hidden="true">↗</span></article>
+    <article class="archive-entry">
+      <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: '%b %-d' }}</time>
+      <h3><a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a></h3>
+    </article>
     {% endfor %}
-  </div></section>
-  {% else %}<p class="empty-state">第一篇文章正在路上。</p>{% endfor %}
-  <p class="search-empty" role="status" hidden>没有找到相关文章，试试其他关键词。</p>
+  </section>
+  {% else %}<p class="muted">No posts yet.</p>{% endfor %}
 </section>

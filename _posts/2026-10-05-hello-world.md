@@ -1,26 +1,10 @@
 ---
-title: 从这里开始
+title: Hello, world.
 date: 2026-10-05 00:00:00 -0700
-description: 给想法一个可以停留的地方。这个博客的第一篇文字。
-tags: [随笔, 开始]
+description: A small beginning.
+tags: [Notes]
 ---
 
-有些想法，如果不写下来，很快就会消失。
+Welcome to my blog.
 
-所以，从今天开始，给它们留一个位置。这是这个博客的第一篇文章，也是一个新的起点。
-
-<!--more-->
-
-## 为什么写博客
-
-写作不一定是因为已经想明白了。很多时候，正是在写的过程中，才发现自己真正想说什么。
-
-这里可以是一份学习笔记，可以是一段实践记录，也可以只是日常里一个值得记住的瞬间。
-
-## 慢慢来
-
-不急着填满这个地方。先写一篇，再写下一篇。
-
-让记录成为习惯，让想法有迹可循。
-
-> 写下来，就是一个开始。
+This is a place for notes, ideas, and things I learn along the way. More soon.
