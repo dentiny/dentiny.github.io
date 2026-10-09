@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 430" width="1000" height="430" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <rect width="1000" height="430" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">Time relative to native DuckDB (lower is better)</text>
+  <text x="40" y="70" font-size="13" fill="#57606A">Read bars: geometric mean over TPC-H Q1&#8211;Q22; whiskers span the fastest and slowest query.</text>
+
+  <!-- Gridlines and ticks: x = 360 + 360 * ratio -->
+  <g stroke="#ECE7DA">
+    <line x1="360" y1="104" x2="360" y2="366"/>
+    <line x1="540" y1="104" x2="540" y2="366"/>
+    <line x1="900" y1="104" x2="900" y2="366"/>
+  </g>
+  <g font-size="12" fill="#8C959F" text-anchor="middle">
+    <text x="360" y="386">0&#215;</text>
+    <text x="540" y="386">0.5&#215;</text>
+    <text x="720" y="386">1.0&#215;</text>
+    <text x="900" y="386">1.5&#215;</text>
+  </g>
+
+  <!-- Row labels -->
+  <g text-anchor="end">
+    <text x="344" y="134" font-size="15" font-weight="700" fill="#1F2328">Reads, memory backend</text>
+    <text x="344" y="152" font-size="12" fill="#6E7781">SF10, vs in-memory DuckDB</text>
+    <text x="344" y="199" font-size="15" font-weight="700" fill="#1F2328">Reads, local disk</text>
+    <text x="344" y="217" font-size="12" fill="#6E7781">SF10, vs a local .duckdb file</text>
+    <text x="344" y="264" font-size="15" font-weight="700" fill="#1F2328">Reads, S3, cold process</text>
+    <text x="344" y="282" font-size="12" fill="#6E7781">SF1, vs a .duckdb file over HTTPFS</text>
+    <text x="344" y="329" font-size="15" font-weight="700" fill="#1F2328">Write and deliver to S3</text>
+    <text x="344" y="347" font-size="12" fill="#6E7781">SF1 lineitem, vs write locally + upload</text>
+  </g>
+
+  <!-- Bars -->
+  <g>
+    <rect x="360" y="122" width="331" height="34" rx="4" fill="#F2C94C"/>
+    <rect x="360" y="187" width="389" height="34" rx="4" fill="#F2C94C"/>
+    <rect x="360" y="252" width="432" height="34" rx="4" fill="#F2C94C"/>
+    <rect x="360" y="317" width="378" height="34" rx="4" fill="#F2C94C"/>
+  </g>
+
+  <!-- Whiskers -->
+  <g stroke="#5C4B1E" stroke-width="2">
+    <line x1="608" y1="139" x2="770" y2="139"/>
+    <line x1="608" y1="131" x2="608" y2="147"/>
+    <line x1="770" y1="131" x2="770" y2="147"/>
+
+    <line x1="695" y1="204" x2="864" y2="204"/>
+    <line x1="695" y1="196" x2="695" y2="212"/>
+    <line x1="864" y1="196" x2="864" y2="212"/>
+
+    <line x1="691" y1="269" x2="929" y2="269"/>
+    <line x1="691" y1="261" x2="691" y2="277"/>
+    <line x1="929" y1="261" x2="929" y2="277"/>
+  </g>
+
+  <!-- Native reference line -->
+  <line x1="720" y1="100" x2="720" y2="366" stroke="#1F2328" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="720" y="94" font-size="12" font-weight="600" text-anchor="middle" fill="#1F2328">native</text>
+
+  <!-- Values -->
+  <g font-size="14" font-weight="700" fill="#1F2328">
+    <text x="372" y="144">0.92&#215;</text>
+    <text x="372" y="209">1.08&#215;</text>
+    <text x="372" y="274">1.20&#215;</text>
+    <text x="372" y="339">1.05&#215;</text>
+  </g>
+  <text x="40" y="414" font-size="12" fill="#8C959F">Apple M4, DuckDB v1.5.5. Write bar is the inverse of the median throughput ratio (0.95&#215;). Local-disk writes are slower; see &#8220;What it costs&#8221;.</text>
+</svg>

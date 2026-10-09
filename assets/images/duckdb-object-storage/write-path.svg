@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" width="1000" height="560" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8C959F"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="560" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">fsync means durable in the bucket</text>
+
+  <!-- Staged changes -->
+  <text x="40" y="88" font-size="14" font-weight="600" fill="#8C7A4B">STAGED IN THE FILE HANDLE</text>
+  <g font-size="15">
+    <rect x="40" y="102" width="250" height="40" rx="8" fill="#FFF1C2" stroke="#E3B341"/>
+    <text x="58" y="127" fill="#1F2328">chunk 3 <tspan fill="#57606A">written</tspan></text>
+    <rect x="40" y="150" width="250" height="40" rx="8" fill="#FFF1C2" stroke="#E3B341"/>
+    <text x="58" y="175" fill="#1F2328">chunk 7 <tspan fill="#57606A">written</tspan></text>
+    <rect x="40" y="198" width="250" height="40" rx="8" fill="#FFE8E5" stroke="#E5898A"/>
+    <text x="58" y="223" fill="#1F2328">chunk 9 <tspan fill="#57606A">truncated away</tspan></text>
+    <rect x="40" y="246" width="250" height="40" rx="8" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="58" y="271" fill="#1F2328">new size and mtime</text>
+  </g>
+
+  <!-- FileSync arrow -->
+  <line x1="300" y1="194" x2="372" y2="194" stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="336" y="182" font-size="13" font-weight="600" text-anchor="middle" fill="#57606A">FileSync</text>
+
+  <!-- Batch -->
+  <rect x="380" y="102" width="290" height="184" rx="10" fill="#E3F4E6" stroke="#7CC08A"/>
+  <text x="400" y="130" font-size="14" font-weight="600" fill="#2D6A3E">ONE WRITE BATCH</text>
+  <g xml:space="preserve" font-family="'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#1F2328">
+    <text x="400" y="164">put    c/1/3</text>
+    <text x="400" y="192">put    c/1/7</text>
+    <text x="400" y="220">delete c/1/9</text>
+    <text x="400" y="248">put    m/1</text>
+  </g>
+  <text x="400" y="274" font-size="12" fill="#57606A">all or nothing</text>
+
+  <!-- Flush arrow -->
+  <line x1="680" y1="194" x2="752" y2="194" stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="716" y="182" font-size="13" font-weight="600" text-anchor="middle" fill="#57606A">write + flush</text>
+
+  <!-- Bucket (cylinder) -->
+  <g>
+    <path d="M 760 122 L 760 266 A 100 18 0 0 0 960 266 L 960 122" fill="#DDE8FF" stroke="#7FA6EE"/>
+    <ellipse cx="860" cy="122" rx="100" ry="18" fill="#EEF3FF" stroke="#7FA6EE"/>
+    <text x="860" y="180" font-size="16" font-weight="700" text-anchor="middle" fill="#1F2328">Bucket</text>
+    <text x="860" y="204" font-size="14" text-anchor="middle" fill="#57606A">new SlateDB WAL object</text>
+  </g>
+  <text x="860" y="318" font-size="14" font-weight="600" text-anchor="middle" fill="#1A7F37">&#10003; then FileSync returns</text>
+
+  <!-- MoveFile -->
+  <line x1="40" y1="350" x2="960" y2="350" stroke="#E6E1D3"/>
+  <text x="40" y="384" font-size="14" font-weight="600" fill="#8C7A4B">CHECKPOINT RENAMES DB.WAL.CHECKPOINT ONTO DB.WAL: ONE TRANSACTION, NO DATA COPIED</text>
+
+  <g xml:space="preserve" font-family="'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace" font-size="14" fill="#1F2328">
+    <rect x="40" y="402" width="380" height="124" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="60" y="430" font-family="Inter, -apple-system, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#57606A">BEFORE</text>
+    <text x="60" y="462">p/db.wal.checkpoint  &#8594; 5</text>
+    <text x="60" y="494">p/db.wal             &#8594; 4</text>
+
+    <rect x="580" y="402" width="380" height="124" rx="10" fill="#E3F4E6" stroke="#7CC08A"/>
+    <text x="600" y="430" font-family="Inter, -apple-system, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#2D6A3E">AFTER</text>
+    <text x="600" y="462">p/db.wal             &#8594; 5</text>
+    <text x="600" y="494" fill="#8C959F">m/4, c/4/*          deleted</text>
+  </g>
+  <line x1="432" y1="464" x2="568" y2="464" stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="500" y="452" font-size="13" font-weight="600" text-anchor="middle" fill="#57606A">MoveFile</text>
+</svg>
