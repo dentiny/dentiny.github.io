@@ -266,4 +266,4 @@ Most of these extensions started as someone's problem: a slow dashboard, a flaky
 
 ## Thanks
 
-Thank you to [@peterxcli](https://github.com/peterxcli) (`cache_prewarm`, `observefs`, `query_condition_cache`), [@DouEnergy](https://github.com/DouEnergy) (`cache_httpfs`) and [@Andrewtangtang](https://github.com/Andrewtangtang) (`query_condition_cache`, `table_inspector`). Thanks also to the DuckDB Labs team and the `community-extensions` maintainers, who review these extensions and build them for every platform on every release.
+Thank you to [@peterxcli](https://github.com/peterxcli) (`cache_prewarm`, `duckdb_object_storage`, `observefs`, `query_condition_cache`), [@DouEnergy](https://github.com/DouEnergy) (`cache_httpfs`) and [@Andrewtangtang](https://github.com/Andrewtangtang) (`duckdb_object_storage`, `duckherder`, `query_condition_cache`, `table_inspector`). Thanks also to the DuckDB Labs team and the `community-extensions` maintainers, who review these extensions and build them for every platform on every release.
