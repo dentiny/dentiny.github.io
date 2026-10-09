@@ -55,7 +55,7 @@ CALL cache_httpfs_wrap_cache_filesystem('duckdb_opendalfs');
 
 Two kinds of problems get my attention.
 
-**Pain that users have already written down.** I read DuckDB's issue tracker, its discussion threads and my own repositories' issues, looking for complaints that keep coming back. The disk cache request above is one example. After `cache_httpfs` shipped, [more than 40 issues from other people](https://github.com/dentiny/duck-read-cache-fs/issues?q=is%3Aissue+-author%3Adentiny) shaped what it became.
+**Pain points users already feel**, like the disk cache request above:
 
 ![Pain points of remote data mapped to the extensions that fix them](/assets/images/duckdb-extensions/pain-to-fix.png)
 
