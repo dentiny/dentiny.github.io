@@ -19,6 +19,7 @@ tags: [DuckDB, Object Storage, SlateDB]
 - The only dependency is object storage. There's no catalog service, no Postgres, no coordinator and no daemon. All metadata, including the writer-fencing state, lives in the bucket.
 - DuckDB's storage engine is untouched. The extension replaces the disk underneath it, so ART indexes, enforced primary and foreign keys, the WAL, checkpoints, `COPY` and extension indexes all behave as they do on a laptop.
 - Underneath is [SlateDB](https://slatedb.io/), an LSM tree built for object storage. DuckDB's 256 KiB blocks map one-to-one onto SlateDB keys, and every `fsync` becomes one atomic, durable write batch.
+- All storage access goes through [Apache OpenDAL](https://opendal.apache.org/). S3, the local filesystem and memory share one code path today, and OpenDAL's other services, such as GCS, Azure Blob Storage and HDFS, are within reach.
 - One writer and any number of read-only processes can attach the same database at the same time.
 - On TPC-H, reads are within about 10% of native DuckDB on local storage. Cold reads from S3 come in about 1.2× slower than native DuckDB reading a `.duckdb` file over HTTPFS. Writing straight to S3 matches "write locally, then upload".
 - DuckDB's own SQLLogicTest suite runs against it. The skip list for extension bugs is empty.
@@ -127,6 +128,16 @@ DuckDB updates its files in place: it rewrites 256 KiB blocks at arbitrary offse
 
 What we needed was a storage engine built for this exact mismatch, and SlateDB is one: an embedded LSM tree whose WAL, memtable flushes and compacted SSTs all live in object storage. It gives us batched durable writes without rewriting large objects, atomic write batches, serializable transactions, background compaction that reclaims overwritten blocks, non-fencing readers, and caching on the read path.
 
+### One storage layer for every backend: OpenDAL
+
+SlateDB talks to storage through an object-store interface, and we give it an adapter over an [Apache OpenDAL](https://opendal.apache.org/) `Operator`. Choosing a backend just means choosing which `Operator` to build: S3 (or MinIO), a local directory, or memory. Everything above that line is identical, so the local backend you develop against runs the same code as production on S3, and the memory backend makes tests fast without mocking anything.
+
+OpenDAL gives us more than portability:
+
+- **Layers.** `duckdb_objfs_io_stats()` is an OpenDAL layer wrapped around every operation, recording request counts, latency and payload bytes, whichever backend is in use.
+- **Correct semantics on each backend.** On the local filesystem, OpenDAL writes through a temporary directory and renames into place, so SlateDB never sees a half-written manifest.
+- **Room to grow.** We compile in S3, the local filesystem and memory today. OpenDAL supports dozens of other services, including GCS, Azure Blob Storage and HDFS, so a new backend is mostly a feature flag plus configuration plumbing, not a new storage integration.
+
 ### Every block is exactly one key
 
 ![A DuckDB file's 12 KiB header and 256 KiB blocks each map to one SlateDB key. Paths, metadata and content use three separate key prefixes.](/assets/images/duckdb-object-storage/chunk-layout.svg)
@@ -210,7 +221,7 @@ This isn't free, and we'd rather tell you here than have you find out in product
 
 - **One writer per database.** Exclusivity isn't enforced by a lock. A second read-write attach doesn't fail immediately; fencing stops the first writer later. Run a single writer, or coordinate writers outside the extension.
 - **Readers can lag by about ten seconds.** That includes a `DETACH`/`ATTACH` cycle in the same process, which reuses the cached reader.
-- **Local-disk writes are slow.** Building SF10 `lineitem` and checkpointing ran at 0.19× native throughput. On S3 the gap disappears, because native DuckDB has to upload afterwards anyway, but on local disk it's the biggest cost we have.
+- **Local-disk writes are slow.** Building SF10 `lineitem` and checkpointing ran at 0.19× native throughput. On S3 the gap disappears, because native DuckDB has to upload afterwards anyway, but on local disk it's the biggest cost we have. Logging every commit twice is a likely part of it; see "What comes next."
 - **Cold S3 reads are about 20% slower** than native DuckDB reading a `.duckdb` file over HTTPFS, with the worst query at 1.58×.
 - **The bucket doesn't hold a `.duckdb` file.** It holds SlateDB SSTs, WAL objects and manifests. You can't `aws s3 cp` the database somewhere and open it with stock DuckDB. To get data out, attach both databases and use `COPY FROM DATABASE` or `EXPORT DATABASE`. To bring an existing database in, copy it the same way.
 - **It's DuckDB-only.** If Spark and Trino need to read the same tables, that's what Iceberg and DuckLake are for.
@@ -228,14 +239,39 @@ This isn't free, and we'd rather tell you here than have you find out in product
 
 ## What comes next
 
-- **Faster local writes.** Fewer copies of staged chunks, batching across file handles, and SlateDB flush and compaction settings tuned for DuckDB's write pattern.
+Two of the next steps are design changes rather than tuning, so they get more than a bullet.
+
+### One write-ahead log, not two
+
+Today a commit passes through two write-ahead logs. DuckDB writes its own WAL (`analytics.db.wal`) and calls `fsync` on commit. To us, that WAL is just another file, so its bytes become chunks in a SlateDB write batch, and SlateDB appends that batch to *its* WAL before it reaches the memtable and, eventually, an SST. At checkpoint, DuckDB writes the changed blocks into the database file, which goes through SlateDB's WAL again, and then truncates its own WAL.
+
+Each log is doing its job correctly. Together, they log the same commit twice and pay for two durability points, and that is a likely contributor to the local write gap. We're going to redesign this so a single log provides durability. Either SlateDB's WAL becomes the commit log and DuckDB's WAL no longer needs to be persisted separately, or DuckDB's WAL stays authoritative and block writes skip SlateDB's WAL. Most of the design work is deciding which side owns durability and how recovery replays it.
+
+### From the filesystem to the block manager
+
+We plug in at DuckDB's `FileSystem` layer because it was the most convenient place to start. DuckDB already routes every database file through it, so a virtual filesystem could store real databases from day one without changing DuckDB at all. The cost is that we see bytes and offsets, not blocks. That's why we had to work backwards from DuckDB's file layout, using the 12 KiB header offset, to get one key per block.
+
+DuckDB has a better seam one level up. Its storage goes through an abstract [`BlockManager`](https://github.com/duckdb/duckdb/blob/069cc9f9b5be802405797faecc284961b07c70ef/src/include/duckdb/storage/block_manager.hpp#L29-L101), which reads and writes whole blocks by block ID, allocates and frees blocks, writes the database header, and syncs. The on-disk implementation, [`SingleFileBlockManager`](https://github.com/duckdb/duckdb/blob/069cc9f9b5be802405797faecc284961b07c70ef/src/include/duckdb/storage/single_file_block_manager.hpp#L58-L61), lays those blocks out at byte offsets in a single file, and our filesystem layer then maps the offsets back into blocks.
+
+A block manager backed directly by SlateDB would remove that round trip and give us much more flexibility:
+
+- **Blocks keyed by block ID**, with no offset arithmetic and no file layout to work backwards from.
+- **Block size and layout chosen for object storage**, rather than inherited from a single-file format.
+- **Checkpoints as one transaction** over the blocks they write and free. Freed blocks become deletes instead of a file truncation.
+- **A natural place to merge the two WALs**, because commit and checkpoint semantics are visible at that layer.
+- **Block-level versioning**, which would make point-in-time reads and cheap database branching, built on SlateDB checkpoints and clones, much easier.
+
+There's a catch. DuckDB constructs `SingleFileBlockManager` directly inside its storage manager ([here](https://github.com/duckdb/duckdb/blob/069cc9f9b5be802405797faecc284961b07c70ef/src/storage/storage_manager.cpp#L439) and [here](https://github.com/duckdb/duckdb/blob/069cc9f9b5be802405797faecc284961b07c70ef/src/storage/storage_manager.cpp#L467)), so an extension can't supply its own block manager today. Getting there means either a storage extension that brings its own storage manager, or a small extension point upstream. The filesystem layer got us a working system first. The block manager is where we'd like to end up.
+
+### Also on the list
+
+- **Faster local writes.** Beyond the single WAL: fewer copies of staged chunks, batching across file handles, and SlateDB flush and compaction settings tuned for DuckDB's write pattern.
 - **Faster remote reads.** Prefetching that follows DuckDB's scan pattern, better persistent-cache defaults, and warming the cache on attach.
 - **Fail-fast writer exclusivity.** A second read-write attach should be rejected right away, not fenced later.
 - **Reader freshness on demand.** A configurable manifest polling interval, and an explicit way to refresh to the latest commit.
 - **Directly importing existing `.duckdb` files**, which would also empty the "unsupported" skip list.
 - **Directory listing**, so globbing over `duckdb_objfs://` paths works.
-- **More backends.** GCS and Azure Blob Storage are mostly configuration work, given OpenDAL.
-- **Point-in-time reads and branching.** SlateDB checkpoints and clones could give DuckDB time travel and near-instant copies of a production database for testing.
+- **More backends through OpenDAL.** GCS, Azure Blob Storage and HDFS are mostly feature flags and configuration, with credentials coming from DuckDB secrets.
 - **Per-database configuration**, so different `ATTACH` statements can use different buckets or backends.
 
 ## Takeaways
@@ -243,6 +279,8 @@ This isn't free, and we'd rather tell you here than have you find out in product
 - **DuckDB can separate compute from storage without giving up being a database.** Indexes, constraints, the WAL, the catalog and the extension ecosystem all come along, because the storage engine never knows anything changed.
 - **The deployment is a bucket.** There's no catalog service and no metadata database. All state, including writer fencing, lives in object storage.
 - **Block alignment is the trick.** One DuckDB block is one SlateDB key, and one `fsync` is one atomic, durable batch.
+- **OpenDAL makes it portable.** S3, local disk and memory share one code path, and more backends are mostly configuration.
+- **The design will go deeper.** Next up: one WAL instead of two, and moving from the filesystem layer to a SlateDB-backed block manager.
 - **It isn't trying to replace table formats.** Use it for databases DuckDB owns. Use Iceberg or DuckLake for tables many engines share. Attach all of them in one session when you need both.
 - **It's honest about its limits:** one writer, readers that may lag about ten seconds, and local writes that still need work.
 
