@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" width="1000" height="500" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8C959F"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#CF222E"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="500" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">One writer, any number of readers, one bucket</text>
+
+  <!-- Writer -->
+  <rect x="40" y="150" width="250" height="90" rx="10" fill="#FFF1C2" stroke="#E3B341"/>
+  <text x="165" y="186" font-size="16" font-weight="700" text-anchor="middle" fill="#1F2328">Ingest / ETL job</text>
+  <text x="165" y="210" font-size="14" text-anchor="middle" fill="#57606A">read-write ATTACH</text>
+
+  <!-- Bucket -->
+  <g>
+    <path d="M 390 150 L 390 320 A 110 20 0 0 0 610 320 L 610 150" fill="#DDE8FF" stroke="#7FA6EE"/>
+    <ellipse cx="500" cy="150" rx="110" ry="20" fill="#EEF3FF" stroke="#7FA6EE"/>
+    <text x="500" y="218" font-size="16" font-weight="700" text-anchor="middle" fill="#1F2328">Bucket</text>
+    <text x="500" y="244" font-size="14" text-anchor="middle" fill="#57606A" font-family="'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace">analytics.db</text>
+    <text x="500" y="268" font-size="13" text-anchor="middle" fill="#57606A">manifest, WAL, SSTs</text>
+  </g>
+
+  <!-- Writer -> bucket -->
+  <line x1="294" y1="195" x2="380" y2="195" stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="337" y="183" font-size="13" text-anchor="middle" fill="#57606A">commits</text>
+
+  <!-- Readers -->
+  <g font-size="16" text-anchor="middle">
+    <rect x="710" y="96" width="250" height="64" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="835" y="122" font-weight="700" fill="#1F2328">Dashboard</text>
+    <text x="835" y="144" font-size="13" fill="#57606A">READ_ONLY</text>
+
+    <rect x="710" y="188" width="250" height="64" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="835" y="214" font-weight="700" fill="#1F2328">Notebook</text>
+    <text x="835" y="236" font-size="13" fill="#57606A">READ_ONLY</text>
+
+    <rect x="710" y="280" width="250" height="64" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="835" y="306" font-weight="700" fill="#1F2328">API service</text>
+    <text x="835" y="328" font-size="13" fill="#57606A">READ_ONLY</text>
+  </g>
+  <g stroke="#8C959F" stroke-width="2" fill="none" marker-end="url(#arrow)">
+    <path d="M 614 200 C 660 200, 660 128, 704 128"/>
+    <path d="M 614 220 L 704 220"/>
+    <path d="M 614 240 C 660 240, 660 312, 704 312"/>
+  </g>
+  <text x="835" y="378" font-size="13" text-anchor="middle" fill="#57606A">see new commits within ~10 seconds</text>
+  <text x="835" y="398" font-size="13" text-anchor="middle" fill="#1A7F37" font-weight="600">readers never fence the writer</text>
+
+  <!-- Second writer -->
+  <rect x="40" y="350" width="250" height="90" rx="10" fill="#FFF5F5" stroke="#CF222E" stroke-dasharray="6 5"/>
+  <text x="165" y="386" font-size="16" font-weight="700" text-anchor="middle" fill="#1F2328">A second writer</text>
+  <text x="165" y="410" font-size="14" text-anchor="middle" fill="#57606A">by mistake</text>
+  <path d="M 294 395 C 350 395, 360 300, 400 290" fill="none" stroke="#CF222E" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow-red)"/>
+  <text x="165" y="272" font-size="13" text-anchor="middle" fill="#CF222E">takes over the manifest; the old</text>
+  <text x="165" y="290" font-size="13" text-anchor="middle" fill="#CF222E">writer errors on its next flush</text>
+</svg>

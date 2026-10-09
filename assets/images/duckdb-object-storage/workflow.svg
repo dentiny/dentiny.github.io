@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 450" width="1000" height="450" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8C959F"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#CF222E"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="450" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">Sharing a DuckDB database: today, and with a bucket</text>
+
+  <!-- Today -->
+  <text x="40" y="88" font-size="14" font-weight="600" fill="#8C7A4B">TODAY</text>
+  <g text-anchor="middle">
+    <rect x="40" y="102" width="200" height="66" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="140" y="130" font-size="16" font-weight="700" fill="#1F2328">Build locally</text>
+    <text x="140" y="152" font-size="13" fill="#57606A">a .duckdb file on one disk</text>
+
+    <rect x="290" y="102" width="200" height="66" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="390" y="130" font-size="16" font-weight="700" fill="#1F2328">Upload it</text>
+    <text x="390" y="152" font-size="13" fill="#57606A" font-family="'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace">aws s3 cp</text>
+
+    <rect x="540" y="102" width="200" height="66" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="640" y="130" font-size="16" font-weight="700" fill="#1F2328">Readers attach</text>
+    <text x="640" y="152" font-size="13" fill="#57606A">read-only, over HTTPFS</text>
+
+    <rect x="790" y="102" width="170" height="66" rx="10" fill="#FFF5F5" stroke="#E5898A"/>
+    <text x="875" y="130" font-size="16" font-weight="700" fill="#1F2328">Data changed?</text>
+    <text x="875" y="152" font-size="13" fill="#CF222E">start over</text>
+  </g>
+  <g stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)">
+    <line x1="244" y1="135" x2="282" y2="135"/>
+    <line x1="494" y1="135" x2="532" y2="135"/>
+    <line x1="744" y1="135" x2="782" y2="135"/>
+  </g>
+  <path d="M 875 172 C 875 222, 140 222, 140 178" fill="none" stroke="#CF222E" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow-red)"/>
+  <text x="500" y="236" font-size="13" text-anchor="middle" fill="#CF222E">every update repeats the whole cycle</text>
+
+  <line x1="40" y1="262" x2="960" y2="262" stroke="#E6E1D3"/>
+
+  <!-- With the extension -->
+  <text x="40" y="296" font-size="14" font-weight="600" fill="#8C7A4B">WITH DUCKDB_OBJECT_STORAGE</text>
+  <g text-anchor="middle">
+    <rect x="40" y="320" width="250" height="70" rx="10" fill="#FFF1C2" stroke="#E3B341"/>
+    <text x="165" y="350" font-size="16" font-weight="700" fill="#1F2328">Any job, any machine</text>
+    <text x="165" y="372" font-size="13" fill="#57606A">read-write ATTACH</text>
+
+    <path d="M 390 322 L 390 384 A 110 16 0 0 0 610 384 L 610 322" fill="#DDE8FF" stroke="#7FA6EE"/>
+    <ellipse cx="500" cy="322" rx="110" ry="16" fill="#EEF3FF" stroke="#7FA6EE"/>
+    <text x="500" y="360" font-size="16" font-weight="700" fill="#1F2328">Bucket</text>
+    <text x="500" y="380" font-size="13" fill="#57606A">is the database</text>
+
+    <rect x="710" y="320" width="250" height="70" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="835" y="350" font-size="16" font-weight="700" fill="#1F2328">Readers anywhere</text>
+    <text x="835" y="372" font-size="13" fill="#57606A">READ_ONLY, nothing to copy</text>
+  </g>
+  <g stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)">
+    <line x1="294" y1="355" x2="380" y2="355"/>
+    <line x1="706" y1="355" x2="620" y2="355"/>
+  </g>
+  <text x="337" y="343" font-size="13" text-anchor="middle" fill="#57606A">commits</text>
+  <text x="663" y="343" font-size="13" text-anchor="middle" fill="#57606A">reads</text>
+  <text x="500" y="428" font-size="14" font-weight="600" text-anchor="middle" fill="#1A7F37">no upload step, no file to ship, no second copy</text>
+</svg>

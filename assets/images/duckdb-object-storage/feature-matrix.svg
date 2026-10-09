@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540" width="1000" height="540" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <rect width="1000" height="540" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">A database, not a table format</text>
+
+  <!-- Highlight our column -->
+  <rect x="432" y="70" width="186" height="410" rx="10" fill="#FFF6D6" stroke="#E3B341"/>
+
+  <!-- Header -->
+  <g font-size="15" font-weight="700" text-anchor="middle" fill="#1F2328">
+    <text x="525" y="100">duckdb_object_storage</text>
+    <text x="715" y="100">DuckLake</text>
+    <text x="885" y="100">Iceberg</text>
+  </g>
+
+  <!-- Row separators -->
+  <g stroke="#E6E1D3">
+    <line x1="40" y1="116" x2="960" y2="116"/>
+    <line x1="40" y1="161" x2="960" y2="161"/>
+    <line x1="40" y1="206" x2="960" y2="206"/>
+    <line x1="40" y1="251" x2="960" y2="251"/>
+    <line x1="40" y1="296" x2="960" y2="296"/>
+    <line x1="40" y1="341" x2="960" y2="341"/>
+    <line x1="40" y1="386" x2="960" y2="386"/>
+    <line x1="40" y1="431" x2="960" y2="431"/>
+  </g>
+
+  <!-- Row labels -->
+  <g font-size="15" fill="#1F2328">
+    <text x="40" y="144">Runs besides the bucket</text>
+    <text x="40" y="189">Data format</text>
+    <text x="40" y="234">Indexes (ART, HNSW, R-tree)</text>
+    <text x="40" y="279">Enforced primary, unique, foreign keys</text>
+    <text x="40" y="324">Compression picked by measuring data</text>
+    <text x="40" y="369">Small, frequent writes</text>
+    <text x="40" y="414">Engines that can read it</text>
+    <text x="40" y="459">Concurrent writers</text>
+  </g>
+
+  <!-- Our column -->
+  <g font-size="14" text-anchor="middle" fill="#1F2328">
+    <text x="525" y="144" font-weight="700" fill="#1A7F37">Nothing</text>
+    <text x="525" y="189">Native DuckDB</text>
+    <text x="525" y="236" font-size="20" font-weight="700" fill="#1A7F37">&#10003;</text>
+    <text x="525" y="281" font-size="20" font-weight="700" fill="#1A7F37">&#10003;</text>
+    <text x="525" y="326" font-size="20" font-weight="700" fill="#1A7F37">&#10003;</text>
+    <text x="525" y="369">WAL, then checkpoint</text>
+    <text x="525" y="414">DuckDB</text>
+    <text x="525" y="459" font-weight="700" fill="#9A6700">One</text>
+  </g>
+
+  <!-- DuckLake -->
+  <g font-size="14" text-anchor="middle" fill="#57606A">
+    <text x="715" y="144">A catalog database*</text>
+    <text x="715" y="189">Parquet</text>
+    <text x="715" y="236" font-size="20" fill="#CF222E">&#10007;</text>
+    <text x="715" y="281" font-size="20" fill="#CF222E">&#10007;</text>
+    <text x="715" y="324">Parquet writer rules</text>
+    <text x="715" y="369">New files, or inlined</text>
+    <text x="715" y="414">DuckDB; open spec</text>
+    <text x="715" y="459">Many</text>
+  </g>
+
+  <!-- Iceberg -->
+  <g font-size="14" text-anchor="middle" fill="#57606A">
+    <text x="885" y="144">A catalog service</text>
+    <text x="885" y="189">Parquet</text>
+    <text x="885" y="236" font-size="20" fill="#CF222E">&#10007;</text>
+    <text x="885" y="281" font-size="20" fill="#CF222E">&#10007;</text>
+    <text x="885" y="324">Parquet writer rules</text>
+    <text x="885" y="369">New files per commit</text>
+    <text x="885" y="414">Spark, Trino, Flink, &#8230;</text>
+    <text x="885" y="459">Many</text>
+  </g>
+
+  <text x="40" y="514" font-size="13" fill="#57606A">* DuckDB or SQLite on a single machine; PostgreSQL or MySQL once several machines share the lake.</text>
+</svg>

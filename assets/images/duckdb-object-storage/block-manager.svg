@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" width="1000" height="500" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8C959F"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="500" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">Moving down a layer: from the filesystem to the block manager</text>
+
+  <!-- Today -->
+  <text x="40" y="88" font-size="14" font-weight="600" fill="#8C7A4B">TODAY</text>
+  <g text-anchor="middle">
+    <rect x="40" y="102" width="400" height="56" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="240" y="136" font-size="15" font-weight="700" fill="#1F2328">DuckDB storage engine</text>
+
+    <rect x="40" y="184" width="400" height="64" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="240" y="210" font-size="15" font-weight="700" fill="#1F2328">SingleFileBlockManager</text>
+    <text x="240" y="232" font-size="13" fill="#57606A">block ID &#8594; byte offset in one file</text>
+
+    <rect x="40" y="274" width="400" height="64" rx="10" fill="#FFF1C2" stroke="#E3B341"/>
+    <text x="240" y="300" font-size="15" font-weight="700" fill="#1F2328">duckdb_objfs FileSystem</text>
+    <text x="240" y="322" font-size="13" fill="#57606A">byte offset &#8594; chunk key, via 12 KiB header math</text>
+
+    <rect x="40" y="364" width="400" height="56" rx="10" fill="#DDE8FF" stroke="#7FA6EE"/>
+    <text x="240" y="398" font-size="15" font-weight="700" fill="#1F2328">SlateDB</text>
+  </g>
+  <g stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)">
+    <line x1="240" y1="160" x2="240" y2="178"/>
+    <line x1="240" y1="250" x2="240" y2="268"/>
+    <line x1="240" y1="340" x2="240" y2="358"/>
+  </g>
+  <text x="40" y="452" font-size="13" fill="#57606A">Blocks become offsets, then offsets become blocks again.</text>
+
+  <!-- Future -->
+  <text x="560" y="88" font-size="14" font-weight="600" fill="#8C7A4B">WHERE WE WANT TO BE</text>
+  <g text-anchor="middle">
+    <rect x="560" y="102" width="400" height="56" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="760" y="136" font-size="15" font-weight="700" fill="#1F2328">DuckDB storage engine</text>
+
+    <rect x="560" y="184" width="400" height="64" rx="10" fill="#FFF1C2" stroke="#E3B341"/>
+    <text x="760" y="210" font-size="15" font-weight="700" fill="#1F2328">SlateDB-backed BlockManager</text>
+    <text x="760" y="232" font-size="13" fill="#57606A">block ID &#8594; key</text>
+
+    <rect x="560" y="274" width="400" height="56" rx="10" fill="#DDE8FF" stroke="#7FA6EE"/>
+    <text x="760" y="308" font-size="15" font-weight="700" fill="#1F2328">SlateDB</text>
+  </g>
+  <g stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)">
+    <line x1="760" y1="160" x2="760" y2="178"/>
+    <line x1="760" y1="250" x2="760" y2="268"/>
+  </g>
+  <g font-size="14" fill="#1F2328">
+    <text x="560" y="366"><tspan fill="#1A7F37" font-weight="700">&#10003;</tspan>  Block size and layout chosen for object storage</text>
+    <text x="560" y="392"><tspan fill="#1A7F37" font-weight="700">&#10003;</tspan>  A checkpoint is one transaction; freed blocks are deletes</text>
+    <text x="560" y="418"><tspan fill="#1A7F37" font-weight="700">&#10003;</tspan>  A natural place for a single WAL</text>
+    <text x="560" y="444"><tspan fill="#1A7F37" font-weight="700">&#10003;</tspan>  Block-level versioning: point-in-time reads, branching</text>
+  </g>
+</svg>
