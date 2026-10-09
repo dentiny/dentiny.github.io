@@ -7,7 +7,9 @@ tags: [DuckDB, Extensions, Storage, Caching]
 
 DuckDB is fast on a laptop SSD. Point it at S3 and you're dealing with round trips, tail latency, throttling and egress bills instead.
 
-Since March 2025, my collaborators and I have shipped 18 DuckDB community extensions to close that gap. They've been downloaded more than 2.2 million times, and `cache_httpfs` is the fifth most downloaded of the roughly 370 extensions in the community catalog.
+In November 2024, a DuckDB user opened [an issue on `httpfs`](https://github.com/duckdb/duckdb-httpfs/issues/4) asking for a disk cache: querying S3 from a laptop was slow, and every query paid for egress again. That issue is still open. Four months later I shipped `cache_httpfs` as a community extension. Last week it was downloaded 58,798 times, fifth among roughly 360 community extensions.
+
+That's the pattern behind everything in this post. Since March 2025, my collaborators and I have shipped 18 DuckDB extensions, downloaded more than 2.2 million times. Here's the short version.
 
 **TL;DR**
 
@@ -25,11 +27,19 @@ Since March 2025, my collaborators and I have shipped 18 DuckDB community extens
 
 ---
 
-## What hurts, and what fixes it
+## What a DuckDB extension is
 
-![Pain points of remote data mapped to the extensions that fix them](/assets/images/duckdb-extensions/pain-to-fix.png)
+An extension is native code that DuckDB loads into its own process with `INSTALL` and `LOAD`. Once loaded, it runs as part of the engine: no separate service, no network hop, no fork of DuckDB. And extensions can do far more than add functions. DuckDB lets them plug in at several levels, from how bytes are read to how a query is planned.
 
-The filesystem extensions wrap any registered DuckDB filesystem, including ones I didn't write, so they stack. Here is a GCS bucket cached on local disk:
+![The hooks DuckDB exposes to extensions, and which of my extensions use each one](/assets/images/duckdb-extensions/extension-hooks.png)
+
+Community extensions are built, signed and distributed by DuckDB for every platform, from a short descriptor in [`duckdb/community-extensions`](https://github.com/duckdb/community-extensions). Anyone can install one with `INSTALL cache_httpfs FROM community;`, with no custom repository and no unsigned flag.
+
+## How I build them
+
+**One extension, one capability.** Caching, timeouts, rate limits and hedged requests are four extensions, not four settings in one big one. You can adopt, debug and remove each one on its own.
+
+**Everything composes.** Each filesystem extension wraps any registered DuckDB filesystem, including ones I didn't write, so they stack. Here is a GCS bucket cached on local disk:
 
 ```sql
 LOAD duckdb_opendalfs;   -- reach GCS, Azure, Hugging Face, SFTP, ...
@@ -38,6 +48,18 @@ CALL cache_httpfs_wrap_cache_filesystem('duckdb_opendalfs');
 ```
 
 ![The extensions arranged as a layered IO stack](/assets/images/duckdb-extensions/storage-stack.png)
+
+**Stay focused.** Almost everything I build is about storage, caching, or getting data in and out of DuckDB. The resilience and observability extensions exist to make those three dependable in production.
+
+## Why I build them
+
+Two kinds of problems get my attention.
+
+**Pain that users have already written down.** I read DuckDB's issue tracker, its discussion threads and my own repositories' issues, looking for complaints that keep coming back. The disk cache request above is one example. After `cache_httpfs` shipped, [more than 40 issues from other people](https://github.com/dentiny/duck-read-cache-fs/issues?q=is%3Aissue+-author%3Adentiny) shaped what it became.
+
+![Pain points of remote data mapped to the extensions that fix them](/assets/images/duckdb-extensions/pain-to-fix.png)
+
+**Connections to the outside world that don't belong in DuckDB's core.** DuckDB keeps its core small and free of external dependencies, which is right for the engine. But users still need to read XZ-compressed CSVs, write Lance datasets, reach WebDAV and SFTP, or keep a database in SlateDB. Those bring heavy dependencies, such as a Rust Lance writer, Apache OpenDAL or SlateDB, and they change faster than DuckDB's release cycle. An extension is the right home for them: it ships on its own schedule, and only the people who need it pay for it.
 
 ---
 
