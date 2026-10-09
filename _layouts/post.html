@@ -4,7 +4,13 @@ layout: default
 <article class="post-page">
   <a class="back-link" href="{{ '/archive/' | relative_url }}">← All posts</a>
   <header class="page-header">
-    <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%b %-d, %Y' }}</time>
+    {% assign words = content | strip_html | number_of_words %}
+    {% assign minutes = words | plus: 199 | divided_by: 200 %}
+    <p class="post-meta">
+      <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%b %-d, %Y' }}</time>
+      <span aria-hidden="true">·</span>
+      <span>{{ minutes }} min read</span>
+    </p>
     <h1>{{ page.title | escape }}</h1>
   </header>
   <div class="prose">{{ content }}</div>
