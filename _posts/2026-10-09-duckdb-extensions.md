@@ -40,6 +40,8 @@ Community extensions are built, signed and distributed by DuckDB for every platf
 
 **One extension, one capability.** Caching, timeouts, rate limits and hedged requests are four extensions, not four settings in one big one. You can adopt, debug and remove each one on its own.
 
+**Minimal setup, works out of the box.** `INSTALL` and `LOAD`, plus at most a few settings or function calls, should be all you need. Defaults are chosen for the common case: `LOAD cache_httpfs` alone caches every S3 read on local disk. Tuning knobs exist, but you only touch them when you want to.
+
 **Everything composes.** Each filesystem extension wraps any registered DuckDB filesystem, including ones I didn't write, so they stack. Here is a GCS bucket cached on local disk:
 
 ```sql
