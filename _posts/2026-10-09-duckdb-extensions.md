@@ -1,37 +1,29 @@
 ---
 title: "My DuckDB extensions: caching, storage, and everything around remote data"
 date: 2026-10-09 00:00:00 -0700
-description: "Nineteen DuckDB community extensions for caching, storage, accessibility, IO resilience and observability: what each one does, how they fit together, and how many people use them."
+description: "Eighteen DuckDB community extensions for caching, storage, accessibility, IO resilience and observability: what each one does, how they fit together, and where I'd love help."
 tags: [DuckDB, Extensions, Storage, Caching]
 ---
 
 DuckDB is fast on a laptop SSD. Point it at S3 and you're dealing with round trips, tail latency, throttling and egress bills instead.
 
-Since March 2025, my collaborators and I have shipped 19 DuckDB community extensions to close that gap. They've been downloaded more than 2.2 million times. The most popular one, `cache_httpfs`, is the fifth most downloaded of the roughly 370 extensions in the community catalog.
+Since March 2025, my collaborators and I have shipped 18 DuckDB community extensions to close that gap. They've been downloaded more than 2.2 million times, and `cache_httpfs` is the fifth most downloaded of the roughly 370 extensions in the community catalog.
 
 **TL;DR**
 
-- **Small extensions that compose.** Each one fixes a single problem with remote data, and the filesystem-level ones wrap any DuckDB filesystem, so you only add the layers you need.
-- **Five focus areas:** caching, storage backends, accessibility, IO resilience and observability.
-- **Six highlights:** `cache_httpfs`, `query_condition_cache` (up to 314× faster on repeated log queries), `cache_prewarm`, `lance_conversion`, `duckherder` and `duckdb_opendalfs`.
+- **Small extensions that compose.** Each one fixes a single problem, so you load only what you need.
+- **Six highlights:** a persistent cache that reads S3 data up to 345× faster, a predicate cache that runs repeated queries up to 314× faster, cache prewarming, one-statement Lance conversion, remote execution, and one extension for many storage backends.
+- **I'm looking for feature requests and collaborators.** See [open problems](#lets-build-together), or email me at [dentinyhao@gmail.com](mailto:dentinyhao@gmail.com).
 
-![19 DuckDB community extensions grouped into five focus areas](/assets/images/duckdb-extensions/extension-map.png)
-
-*All 19 extensions, grouped by focus area. ★ marks the six highlighted below. Download counts are explained in [Methodology](#methodology).*
+![18 DuckDB community extensions grouped into five focus areas](/assets/images/duckdb-extensions/extension-map.png)
 
 ---
 
-## Why remote data needs more than `httpfs`
+## What hurts, and what fixes it
 
-DuckDB's `httpfs` extension does one job well: it lets DuckDB read `s3://` and `https://` URLs. Production workloads quickly need more than that:
+![Pain points of remote data mapped to the extensions that fix them](/assets/images/duckdb-extensions/pain-to-fix.png)
 
-- **The same bytes get downloaded again and again.** A dashboard that refreshes every 30 seconds keeps asking for the same Parquet footers and row groups.
-- **One slow request can stall a whole scan.** With thousands of `GET`s per query, the slowest one sets the pace.
-- **Failures and throttling are normal.** Object stores return 503s and rate-limit clients, and the default timeouts rarely fit your workload.
-- **Not everything lives on S3.** Teams also keep data on GCS, Azure Blob, Hugging Face, WebDAV and SFTP.
-- **You can't tune what you can't see.** "The query is slow" isn't actionable until you know whether the time went to opens, globs or reads.
-
-Rather than one large extension, I build small ones that each do one thing. The filesystem-level ones expose a `*_wrap` function that takes any registered DuckDB filesystem, including ones I didn't write. For example, here is how to cache a GCS bucket on local disk:
+The filesystem extensions wrap any registered DuckDB filesystem, including ones I didn't write, so they stack. Here is a GCS bucket cached on local disk:
 
 ```sql
 LOAD duckdb_opendalfs;   -- reach GCS, Azure, Hugging Face, SFTP, ...
@@ -39,19 +31,17 @@ LOAD cache_httpfs;       -- cache blocks, metadata and globs on local disk
 CALL cache_httpfs_wrap_cache_filesystem('duckdb_opendalfs');
 ```
 
-`hedged_request_fs`, `rate_limit_fs` and `observefs` plug in the same way.
-
 ![The extensions arranged as a layered IO stack](/assets/images/duckdb-extensions/storage-stack.png)
 
 ---
 
 ## Highlights
 
-### `cache_httpfs`: a persistent read cache for remote files
+### [`cache_httpfs`](https://github.com/dentiny/duck-read-cache-fs): a persistent read cache for remote files
 
-**The problem.** DuckDB's built-in external file cache keeps data in memory only, for the lifetime of the process. Every restart, new container or notebook kernel downloads the same bytes from object storage again, and pays for the egress again.
+DuckDB's built-in file cache lives in memory and disappears when the process exits. `cache_httpfs` is a drop-in replacement for `httpfs` that keeps **data blocks, metadata, file handles and glob results** on local disk, and fetches large reads in parallel.
 
-**What it does.** `cache_httpfs` is a drop-in replacement for `httpfs` that caches four kinds of things: **data blocks, file metadata, file handles and glob results**. Blocks go to local disk by default (or memory if you prefer), with LRU or access-time eviction, multiple cache directories and a reserved-space limit. Large reads are split into aligned blocks and fetched in parallel. A built-in profiler reports cache hit rates and per-operation latency.
+![cache_httpfs benchmark: 10,681 ms with httpfs, 3,934 ms on first read, 31 ms cached](/assets/images/duckdb-extensions/cache-httpfs-benchmark.png)
 
 ```sql
 INSTALL cache_httpfs FROM community;
@@ -59,54 +49,41 @@ LOAD cache_httpfs;   -- loads httpfs for you; on-disk cache is the default
 
 SELECT count(*) FROM 's3://my-bucket/events/*.parquet';   -- cold: fetched from S3
 SELECT count(*) FROM 's3://my-bucket/events/*.parquet';   -- warm: read from local disk
-
-SELECT * FROM cache_httpfs_cache_access_info_query();     -- hits and misses
 ```
 
-If anything goes wrong, `SET cache_httpfs_type = 'noop'` turns caching off and you're back to plain `httpfs`.
+Tiny random reads can be slightly slower because reads are aligned to cache blocks; lower `cache_httpfs_cache_block_size` if that's your workload. `SET cache_httpfs_type = 'noop'` turns caching off entirely.
 
-**Traction.** 1.6 million downloads, about 59,000 last week. It has been in the community catalog's top 10 every archived week since March 2026, and twice reached #2.
+**1.6 million downloads.** It has been in the community top 10 every archived week since March 2026, and twice reached #2.
 
-<!-- TODO(hao): add a concrete speedup from the cache_httpfs sequential/random read benchmark, ideally with the bar chart. -->
+### [`query_condition_cache`](https://github.com/dentiny/duckdb-query-condition-cache): a predicate cache
 
-### `query_condition_cache`: a predicate cache for DuckDB
-
-**The problem.** Monitoring dashboards and log investigations run the same `WHERE` clauses over the same tables all day. DuckDB's zone maps can skip a row group only when its min/max statistics rule it out, which rarely happens for `LIKE` patterns or unsorted columns. Everything else gets scanned and filtered again on every run.
-
-**What it does.** It remembers **which vectors in each row group matched a predicate**. On later queries it adds a `ROW_ID` filter, so DuckDB skips the vectors already known to have no matches. Row groups without a cache entry are scanned as usual. The design follows the SIGMOD '24 paper [*Predicate Caching*](https://dl.acm.org/doi/10.1145/3626246.3653395) and [ClickHouse's query condition cache](https://clickhouse.com/blog/introducing-the-clickhouse-query-condition-cache).
+Dashboards and log investigations run the same `WHERE` clauses all day. Zone maps rarely help with `LIKE` patterns or unsorted columns, so DuckDB scans again on every run. This extension remembers **which vectors matched a predicate** and skips the rest next time. The approach follows the SIGMOD '24 paper [*Predicate Caching*](https://dl.acm.org/doi/10.1145/3626246.3653395) and [ClickHouse's query condition cache](https://clickhouse.com/blog/introducing-the-clickhouse-query-condition-cache).
 
 ```sql
 INSTALL query_condition_cache FROM community;
 LOAD query_condition_cache;
 
--- Automatic: built on the first run, used on later runs.
+-- Built on the first run, used on later runs.
 SELECT count(*) FROM logs WHERE level = 'ERROR' AND msg LIKE '%timeout%';
-
--- Or build an entry ahead of time.
-SELECT * FROM condition_cache_build('logs', 'level = ''ERROR''');
 ```
 
-**Result.** On the [HDFS_v2 log benchmark](https://github.com/logpai/loghub/tree/master/HDFS) (about 71 million log lines), repeated queries ran **up to 314× faster**. The biggest gains came from selective investigation queries.
+![HDFS log analytics benchmark, baseline vs cached, across three investigation stories](/assets/images/duckdb-extensions/qcc-hdfs-benchmark.png)
 
-<!-- TODO(hao): embed docs/img/hdfs_log_bench.png from the repo. -->
+On the [HDFS_v2 log benchmark](https://github.com/logpai/loghub/tree/master/HDFS) (71 million lines), selective drill-down queries ran **314× and 124× faster**. Queries that match most of the table gain about 1.2×, because there's little to skip.
 
-### `cache_prewarm`: `pg_prewarm` for DuckDB
+### [`cache_prewarm`](https://github.com/dentiny/duckdb-cache-prewarm): `pg_prewarm` for DuckDB
 
-**The problem.** The first query after a restart is slow, and on a fresh container or a newly scaled node, a real user is the one who waits.
-
-**What it does.** Modeled on PostgreSQL's `pg_prewarm`, it loads a table's blocks before the first query arrives. It has three modes: `buffer` loads blocks into DuckDB's buffer pool, `read` warms the OS page cache, and `prefetch` sends OS readahead hints. With `cache_httpfs` loaded, it can also pull remote files, including whole glob patterns, into the local disk cache.
+The first query after a restart shouldn't be the slow one. Modeled on PostgreSQL's `pg_prewarm`, this loads data before users arrive: into DuckDB's buffer pool, into the OS page cache, or, with `cache_httpfs`, from S3 to local disk.
 
 ```sql
 SELECT prewarm('events');                              -- buffer pool
 SELECT prewarm('events', 'read', '4GB');               -- OS page cache, capped at 4 GB
-SELECT prewarm_remote('s3://lake/events/*.parquet');   -- needs cache_httpfs
+SELECT prewarm_remote('s3://lake/events/*.parquet');   -- remote files, via cache_httpfs
 ```
 
-### `lance_conversion`: `COPY` any query to Lance
+### [`lance_conversion`](https://github.com/dentiny/duckdb_lance_conversion): `COPY` any query to Lance
 
-**The problem.** [Lance](https://lancedb.github.io/lance/) is a columnar format built for AI and multimodal data. Getting data into it usually takes three steps: export to Parquet, run a separate Python job, then build indexes.
-
-**What it does.** It makes Lance a native `COPY` target. DuckDB reads, filters, joins and casts the data, then streams the result straight into the Rust Lance writer, with no intermediate files. Indexes are declared in the same statement:
+![Before: four steps to get data into Lance. With lance_conversion: one COPY statement](/assets/images/duckdb-extensions/lance-pipeline.png)
 
 ```sql
 COPY (
@@ -122,15 +99,11 @@ COPY (
 );
 ```
 
-It also supports append and overwrite modes and random sampling, and it ships `read_huggingface` and `read_warc` readers. That means going from a Common Crawl WARC file to an indexed Lance dataset takes a single statement.
+It also supports append, overwrite and random sampling, and it ships `read_huggingface` and `read_warc` readers. Released two weeks ago, it already gets about 800 downloads a week.
 
-**Traction.** Released two weeks ago, already about 800 downloads a week.
+### [`duckherder`](https://github.com/dentiny/duckdb-distributed-execution): remote and distributed execution
 
-### `duckherder`: remote and distributed execution over Arrow Flight
-
-**The problem.** DuckDB runs in-process by design. Sometimes the data, or the machine you want to compute on, is somewhere else.
-
-**What it does.** `duckherder` is a DuckDB storage extension. You `ATTACH` a remote server and keep writing the same SQL. Queries run on the server, and results stream back over [Arrow Flight](https://arrow.apache.org/docs/format/Flight.html). On the server side, a driver node splits single-table scans, filters and aggregations across worker nodes. Joins, sorts and writes currently run on the driver alone.
+![duckherder architecture: client DuckDB, driver, workers, Arrow Flight](/assets/images/duckdb-extensions/duckherder-architecture.png)
 
 ```sql
 INSTALL duckherder FROM community;
@@ -143,13 +116,11 @@ INSERT INTO dh.events VALUES (1, 'click'), (2, 'view'), (3, 'click');
 SELECT category, count(*) FROM dh.events GROUP BY ALL;
 ```
 
-It's experimental, a personal project, and not affiliated with DuckDB Labs. It's also the most ambitious item on this list. The goal is a single writer and many readers sharing one database on object storage, which is what `duckdb_object_storage` is for.
+It's experimental, a personal project, and not affiliated with DuckDB Labs. It's also the most ambitious item on this list.
 
-### `duckdb_opendalfs`: one extension, many storage backends
+### [`duckdb_opendalfs`](https://github.com/dentiny/duckdb-opendal-filesystem): one extension, many backends
 
-**The problem.** Without it, every storage service needs its own DuckDB filesystem, each with its own URL rules and credential handling.
-
-**What it does.** It connects [Apache OpenDAL](https://opendal.apache.org/) to DuckDB's filesystem layer. One extension covers **S3-compatible stores, GCS, Azure Blob, Hugging Face, WebDAV, SFTP and more**, all configured through ordinary DuckDB secrets (`opendal_s3`, `opendal_gcs`, `opendal_hf`, …). Every operation has a timeout and retries with exponential backoff by default.
+Built on [Apache OpenDAL](https://opendal.apache.org/), it covers **S3-compatible stores, GCS, Azure Blob, Hugging Face, WebDAV, SFTP and more** through ordinary DuckDB secrets, with timeouts and retries on by default.
 
 ```sql
 INSTALL duckdb_opendalfs FROM community;
@@ -159,36 +130,33 @@ CREATE SECRET prod_gcs (TYPE opendal_gcs, SCOPE 'gcs://analytics', TOKEN '...');
 SELECT * FROM read_parquet('gcs://analytics/events.parquet');
 ```
 
-Combined with `cache_httpfs`, as in the example near the top of this post, OpenDAL provides access to the backends and `cache_httpfs` provides the speed.
+The other twelve extensions each get a one-line summary on the map at the top of this post.
 
----
+<details markdown="1">
+<summary>All 18 repositories</summary>
 
-## The rest of the stack
+| Extension | Repository |
+| --- | --- |
+| `cache_httpfs` | [dentiny/duck-read-cache-fs](https://github.com/dentiny/duck-read-cache-fs) |
+| `query_condition_cache` | [dentiny/duckdb-query-condition-cache](https://github.com/dentiny/duckdb-query-condition-cache) |
+| `cache_prewarm` | [dentiny/duckdb-cache-prewarm](https://github.com/dentiny/duckdb-cache-prewarm) |
+| `lance_conversion` | [dentiny/duckdb_lance_conversion](https://github.com/dentiny/duckdb_lance_conversion) |
+| `duckherder` | [dentiny/duckdb-distributed-execution](https://github.com/dentiny/duckdb-distributed-execution) |
+| `duckdb_opendalfs` | [dentiny/duckdb-opendal-filesystem](https://github.com/dentiny/duckdb-opendal-filesystem) |
+| `curl_httpfs` | [dentiny/duckdb-curl-filesystem](https://github.com/dentiny/duckdb-curl-filesystem) |
+| `duckdb_object_storage` | [dentiny/duckdb-object-storage](https://github.com/dentiny/duckdb-object-storage) |
+| `compression_fs` | [dentiny/duckdb-compression-filesystem](https://github.com/dentiny/duckdb-compression-filesystem) |
+| `hedged_request_fs` | [dentiny/duckdb-hedged-request](https://github.com/dentiny/duckdb-hedged-request) |
+| `httpfs_timeout_retry` | [dentiny/duckdb-httpfs-timeout-retry](https://github.com/dentiny/duckdb-httpfs-timeout-retry) |
+| `rate_limit_fs` | [dentiny/duckdb-rate-limit-filesystem](https://github.com/dentiny/duckdb-rate-limit-filesystem) |
+| `latency_injection_fs` | [dentiny/duckdb-filesystem-latency-injection](https://github.com/dentiny/duckdb-filesystem-latency-injection) |
+| `observefs` | [dentiny/duckdb-filesystem-observability](https://github.com/dentiny/duckdb-filesystem-observability) |
+| `table_inspector` | [dentiny/duckdb-table-inspector](https://github.com/dentiny/duckdb-table-inspector) |
+| `system_stats` | [dentiny/system_stats](https://github.com/dentiny/system_stats) |
+| `query_limiter` | [dentiny/duckdb-query-limiter](https://github.com/dentiny/duckdb-query-limiter) |
+| `huggingface` | [dentiny/duckdb-huggingface](https://github.com/dentiny/duckdb-huggingface) |
 
-**Storage and filesystems**
-
-- **`curl_httpfs`** rebuilds `httpfs`'s HTTP layer on libcurl, with HTTP/2, connection pooling and asynchronous IO. It's fully compatible with `httpfs`. With 270,000 downloads, it's the second most popular extension on this list.
-- **`duckdb_object_storage`** stores writable `.duckdb` databases, including the write-ahead log, on local or S3-compatible storage through [SlateDB](https://slatedb.io/).
-- **`compression_fs`** adds LZ4, Snappy, Brotli, Bzip2 and XZ support, so `read_csv('logs.csv.xz')` just works.
-
-**IO resilience.** All four wrap an existing filesystem; your queries stay the same.
-
-- **`hedged_request_fs`** sends a backup request when a metadata or listing call is slow, then uses whichever response comes back first. This is the technique from [*The Tail at Scale*](https://research.google/pubs/the-tail-at-scale/).
-- **`httpfs_timeout_retry`** sets separate timeouts and retries for open, read, write, list and stat.
-- **`rate_limit_fs`** applies rate and burst limits per filesystem and per operation, so you stay under your object store's throttling limits.
-- **`latency_injection_fs`** adds realistic, randomized latency to any filesystem. Together with `rate_limit_fs`, it simulates a slow, throttled object store on your laptop.
-
-**Observability and governance**
-
-- **`observefs`** records latency histograms for IO operations, per bucket, and shows how DuckDB's external file cache is being used.
-- **`table_inspector`** shows storage details per database, table and column, which helps answer "why is this file 40 GB?"
-- **`system_stats`** exposes CPU, memory and disk statistics as tables.
-- **`query_limiter`** rejects a query before it runs if DuckDB estimates it would scan more rows than a budget you set. It's a guardrail for shared DuckDB deployments.
-
-**Accessibility**
-
-- **`huggingface`** discovers, scans, profiles and sizes Hugging Face datasets, with `cache_httpfs` underneath.
-- **`slack`** lets you search Slack messages with SQL.
+</details>
 
 ---
 
@@ -196,11 +164,7 @@ Combined with `cache_httpfs`, as in the example near the top of this post, OpenD
 
 ![Per-extension cumulative downloads, log scale](/assets/images/duckdb-extensions/downloads-by-extension.png)
 
-`cache_httpfs` accounts for most of the downloads. Remote reads are the first problem most people hit, so that's not surprising. The long tail matters too: the eight IO resilience and observability extensions add up to more than 260,000 downloads.
-
 ![Weekly downloads stacked by focus area](/assets/images/duckdb-extensions/weekly-downloads.png)
-
-*Grey bands are weeks the upstream stats archive skipped. They are missing data, not zero downloads.*
 
 <details markdown="1">
 <summary>Full table</summary>
@@ -225,42 +189,35 @@ Combined with `cache_httpfs`, as in the example near the top of this post, OpenD
 | `lance_conversion` | Accessibility | 2026-09 | 1,832 | 790 |
 | `duckdb_object_storage` | Storage | 2026-09 | 345 | 265 |
 | `compression_fs` | Storage | 2026-09 | — | — |
-| `slack` | Accessibility | 2026-02 | — | — |
 | **Total** | | | **2,201,673** | |
 
 </details>
 
 ---
 
-## Thanks
+## Let's build together {#lets-build-together}
 
-None of this was a solo effort. Thank you to [@peterxcli](https://github.com/peterxcli) (`cache_prewarm`, `observefs`, `query_condition_cache`), [@DouEnergy](https://github.com/DouEnergy) (`cache_httpfs`) and [@Andrewtangtang](https://github.com/Andrewtangtang) (`query_condition_cache`, `table_inspector`). Thanks also to the DuckDB Labs team and the `community-extensions` maintainers, who review these extensions and build them for every platform on every release.
+![Open problems from each project's roadmap, with contact details](/assets/images/duckdb-extensions/help-wanted.png)
 
-## Try one, then tell me what hurts
+Most of these extensions started as someone's problem: a slow dashboard, a flaky bucket, a dataset that needed to be in Lance. If you have one, I want to hear about it.
 
-Every extension installs the same way:
-
-```sql
-INSTALL cache_httpfs FROM community;
-LOAD cache_httpfs;
-```
-
-Where to start:
-
-- **Dashboards on S3:** `cache_httpfs`
-- **Log analytics:** `query_condition_cache`
-- **AI datasets:** `lance_conversion`
-
-If you run DuckDB against object storage and something still hurts, I'd like to hear about it. That's usually how the next extension starts. Email me at [dentinyhao@gmail.com](mailto:dentinyhao@gmail.com), or open an issue on [GitHub](https://github.com/dentiny).
+- **Feature requests and bugs:** open an issue in the extension's repository (listed above).
+- **Collaboration:** whether it's one of the open problems above, a new extension, or running these in production at your company, email me at [dentinyhao@gmail.com](mailto:dentinyhao@gmail.com).
+- **Just using them?** Tell me what works and what doesn't. That's usually how the next extension starts.
 
 <!-- TODO(hao): one-line "about me" (current role, prior work). -->
+
+## Thanks
+
+Thank you to [@peterxcli](https://github.com/peterxcli) (`cache_prewarm`, `observefs`, `query_condition_cache`), [@DouEnergy](https://github.com/DouEnergy) (`cache_httpfs`) and [@Andrewtangtang](https://github.com/Andrewtangtang) (`query_condition_cache`, `table_inspector`). Thanks also to the DuckDB Labs team and the `community-extensions` maintainers, who review these extensions and build them for every platform on every release.
 
 ---
 
 ## Methodology
 
-- **Extensions.** Every `description.yml` in [`duckdb/community-extensions`](https://github.com/duckdb/community-extensions) that lists `dentiny` as a maintainer, 19 in total. "First release" is when the descriptor was added to that repository.
+- **Extensions.** The 18 extensions in [`duckdb/community-extensions`](https://github.com/duckdb/community-extensions) covered in this post, all listing `dentiny` as a maintainer. "First release" is when the descriptor was added to that repository.
 - **Downloads.** Weekly snapshots from `community-extensions.duckdb.org/download-stats-weekly/<year>/<week>.json`. There are 76 archived weeks, from 2024-W40 to 2026-W41, ending October 9, 2026.
-- **Gaps.** The archive is missing 2025-W22–W37, 2025-W41–W45 and 2026-W01–W09. The 2,201,673 total counts only archived weeks, so it's a lower bound. Interpolating the missing weeks gives about 2.6 million. Extensions released during a gap are undercounted further.
+- **Gaps.** The archive is missing 2025-W22–W37, 2025-W41–W45 and 2026-W01–W09. The 2,201,673 total counts only archived weeks, so it's a lower bound. Interpolating the missing weeks gives about 2.6 million.
 - **Ranking.** Computed from the same snapshots for every community extension. `cache_httpfs` is fifth of 359 in the latest week and fifth of 372 summed over all archived weeks.
-- **Caveats.** A download is one `INSTALL`, not one user, so CI pipelines and short-lived containers inflate the counts for every extension. The latest snapshot overlaps the previous one by a few days.
+- **Benchmarks.** `cache_httpfs` numbers come from the [duck-read-cache-fs benchmark](https://github.com/dentiny/duck-read-cache-fs/tree/main/benchmark); `query_condition_cache` numbers come from its [HDFS log benchmark](https://github.com/dentiny/duckdb-query-condition-cache/tree/main/benchmark).
+- **Caveats.** A download is one `INSTALL`, not one user, so CI pipelines and short-lived containers inflate the counts for every extension.
