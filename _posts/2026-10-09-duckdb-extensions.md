@@ -16,7 +16,7 @@ That's the pattern behind everything in this post. Since March 2025, my collabor
 - **Small extensions that compose.** Each one fixes a single problem, so you load only what you need.
 - **Seven highlights:**
   - [`cache_httpfs`](#cache-httpfs): a persistent cache that reads S3 data up to 345× faster
-  - [`query_condition_cache`](#query-condition-cache): a predicate cache that runs repeated queries up to 314× faster
+  - [`query_condition_cache`](#query-condition-cache): a predicate cache that runs repeated queries up to 29× faster
   - [`cache_prewarm`](#cache-prewarm): warms data before the first query
   - [`lance_conversion`](#lance-conversion): turns any query into an indexed Lance dataset in one statement
   - [`duckherder`](#duckherder): runs your SQL on remote servers
@@ -105,9 +105,9 @@ LOAD query_condition_cache;
 SELECT count(*) FROM logs WHERE level = 'ERROR' AND msg LIKE '%timeout%';
 ```
 
-![HDFS log analytics benchmark, baseline vs cached, across three investigation stories](/assets/images/duckdb-extensions/qcc-hdfs-benchmark.png)
+![Query condition cache on HDFS logs with a cold OS page cache: baseline, first query and cache hit across ten queries](/assets/images/duckdb-extensions/qcc-hdfs-benchmark.png)
 
-On the [HDFS_v2 log benchmark](https://github.com/logpai/loghub/tree/master/HDFS) (71 million lines), selective drill-down queries ran **314× and 124× faster**. Queries that match most of the table gain about 1.2×, because there's little to skip.
+On the [HDFS_v2 logs](https://github.com/logpai/loghub/tree/master/HDFS) (58 million records), cache hits ran selective queries **up to 29× faster** with a cold OS page cache, and up to 14× with warm storage. The first run pays for an extra scan to build the entry, and broad or tiny queries have little to skip. [Andrew's write-up](https://andrewtangtang.github.io/writing/query-condition-cache/) has the design and full results.
 
 ### [`cache_prewarm`](https://github.com/dentiny/duckdb-cache-prewarm): `pg_prewarm` for DuckDB {#cache-prewarm}
 
@@ -141,7 +141,7 @@ It also supports append, overwrite and random sampling, and it ships `read_huggi
 
 ### [`duckherder`](https://github.com/dentiny/duckdb-distributed-execution): remote and distributed execution {#duckherder}
 
-![duckherder architecture: client DuckDB, driver, workers, Arrow Flight](/assets/images/duckdb-extensions/duckherder-architecture.png)
+![duckherder architecture: a client sends SQL to a driver over Arrow Flight, workers execute partitions and store data on S3 through duckdb_object_storage](/assets/images/duckdb-extensions/duckherder-architecture.png)
 
 ```sql
 INSTALL duckherder FROM community;
@@ -154,7 +154,7 @@ INSERT INTO dh.events VALUES (1, 'click'), (2, 'view'), (3, 'click');
 SELECT category, count(*) FROM dh.events GROUP BY ALL;
 ```
 
-It's experimental, a personal project, and not affiliated with DuckDB Labs. It's also the most ambitious item on this list.
+The driver plans and partitions the query, workers execute the pieces, and results come back over Arrow Flight. The ObjFS layer is [`duckdb_object_storage`](#duckdb-object-storage), which puts the data on S3. It's experimental, a personal project, and not affiliated with DuckDB Labs. It's also the most ambitious item on this list.
 
 ### [`duckdb_object_storage`](https://github.com/dentiny/duckdb-object-storage): a writable DuckDB database on object storage {#duckdb-object-storage}
 
