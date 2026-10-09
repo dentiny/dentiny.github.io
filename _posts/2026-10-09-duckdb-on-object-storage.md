@@ -21,7 +21,7 @@ tags: [DuckDB, Object Storage, SlateDB]
 - **Underneath are [SlateDB](https://slatedb.io/) and [Apache OpenDAL](https://opendal.apache.org/).** SlateDB is an LSM tree built for object storage, with each DuckDB block stored as one SlateDB key. OpenDAL gives every storage backend one code path.
 - **One writer, any number of readers.** Readers always see a state the writer committed, never a partial write. That makes the extension the storage layer for our distributed execution engine, [Duckherder](https://github.com/dentiny/duckdb-distributed-execution).
 - **The numbers.** On TPC-H, reads are within about 10% of native DuckDB on local storage, and cold reads from S3 are about 1.2× slower than native DuckDB over HTTPFS. Writing straight to S3 matches "write locally, then upload."
-- **Tested with DuckDB's own test suite.** The skip list for extension bugs is empty.
+- **Tested with DuckDB's own test suite.**
 
 DuckDB is a database that lives in a file. That's a large part of its charm: no server, no setup, and a whole analytical database in one `.duckdb` file you can copy around.
 
@@ -32,7 +32,7 @@ The rest of the data stack settled this question years ago: object storage is th
 ## What it looks like
 
 ```sql
-INSTALL duckdb_object_storage FROM community;
+FORCE INSTALL duckdb_object_storage FROM community;
 LOAD duckdb_object_storage;
 LOAD httpfs;  -- provides the S3 secret type
 
@@ -72,8 +72,6 @@ ATTACH 'duckdb_objfs://analytics.db' AS db (READ_ONLY);
 SELECT c.email, sum(o.amount) FROM db.orders o JOIN db.customers c ON o.customer_id = c.id GROUP BY ALL;
 ```
 
-For development, skip the S3 settings: the default backend stores everything under `./.duckdb_objfs` on local disk, using the same code path.
-
 ## Why this matters
 
 The extension is useful wherever DuckDB already does the work and the local disk is what's in the way:
@@ -104,7 +102,9 @@ What you keep by storing the native format:
 - **Indexes.** DuckDB stores ART indexes for primary keys, unique constraints and `CREATE INDEX` in the database file. Extensions can do the same: `spatial` keeps its R-trees there, and `vss` can persist HNSW vector indexes (still behind an experimental flag). Parquet has nowhere to put them.
 - **Constraints that are actually enforced.** `PRIMARY KEY`, `UNIQUE`, `FOREIGN KEY`, `CHECK` and `NOT NULL` all reject bad rows when they're written, not later when someone runs a query.
 - **The whole catalog.** Views, macros, sequences, generated columns, enums, comments and schemas are all stored with the data.
-- **The whole type system and DuckDB's own compression.** Every type round-trips without being mapped to Parquet types. Data is compressed with DuckDB's own codecs, such as ALP, FSST, dictionary and RLE.
+- **The whole type system.** Every type round-trips without being mapped to Parquet types.
+- **Lightweight compression.** DuckDB compresses each column with lightweight codecs: constant, RLE, bit-packing, frame-of-reference, dictionary, FSST for strings and ALP for floating point. They're cheap to decode, and some, such as constant and dictionary vectors, flow into the execution engine without being expanded first. Because blocks arrive already compressed, ObjFS leaves SlateDB's own compression off.
+- **Compression chosen by measuring the data.** At checkpoint, every candidate codec runs an analyze pass over each column segment and estimates its compressed size, and DuckDB keeps the smallest. Sorted timestamps end up delta-encoded and bit-packed, a low-cardinality string column ends up dictionary-encoded, and the choice is made again per row group as the data changes. Parquet has dictionary and RLE encodings too, but writers usually pick them by fixed rules and add a general-purpose codec such as Snappy or ZSTD on top, which every reader has to undo before it can scan.
 - **Cheap small writes.** A single-row `UPDATE` goes into the WAL, and the next checkpoint folds it into the database. It doesn't produce a new data file, a delete file, a snapshot, or later a compaction job.
 - **Everything around the database.** `COPY ... TO`, `COPY FROM DATABASE`, `EXPORT DATABASE`, `CHECKPOINT`, and every extension that works on an attached database.
 
@@ -311,9 +311,9 @@ There's a catch. DuckDB constructs `SingleFileBlockManager` directly inside its 
 Here's what it comes down to: start DuckDB anywhere, attach a database from a bucket, and get the same database you would have on a laptop, with nothing else to run.
 
 ```sql
-INSTALL duckdb_object_storage FROM community;
+FORCE INSTALL duckdb_object_storage FROM community;
 LOAD duckdb_object_storage;
-ATTACH 'duckdb_objfs://hello.db' AS db;   -- local disk by default; set the backend to 's3' for a bucket
+ATTACH 'duckdb_objfs://hello.db' AS db;   -- after the S3 secret and settings from the first example
 ```
 
 Source, issues and benchmarks are on [GitHub](https://github.com/dentiny/duckdb-object-storage).
