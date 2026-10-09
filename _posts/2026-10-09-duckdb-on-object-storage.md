@@ -5,7 +5,7 @@ description: "duckdb_object_storage stores native DuckDB databases (indexes, con
 tags: [DuckDB, Object Storage, SlateDB]
 ---
 
-**`duckdb_object_storage` stores native DuckDB databases (indexes, constraints, WAL and all) directly in object storage. There's no table format, no catalog database and no fork of DuckDB. You need DuckDB and a bucket.**
+**`duckdb_object_storage` stores native DuckDB databases (indexes, constraints, WAL and all) directly in object storage. There's no table format, no catalog database and no fork of DuckDB. You just need DuckDB and a bucket.**
 
 <!--more-->
 
