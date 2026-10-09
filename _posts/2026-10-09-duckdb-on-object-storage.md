@@ -236,7 +236,7 @@ All measurements were taken on an Apple M4 with DuckDB v1.5.5. Read numbers are 
 
 - **Memory backend, SF10.** The geometric mean is 0.92× native in-memory DuckDB, and 20 of 22 queries were faster. The layer adds little overhead when storage itself is fast.
 - **Local disk, SF10.** The geometric mean is 1.08× a native `.duckdb` file, and most queries are within 10%. The worst query, Q5, is 1.40×.
-- **S3, SF1, cold process, memory cache only.** The geometric mean is 1.20× native DuckDB reading a `.duckdb` file through HTTPFS, ranging from 0.92× to 1.58×. Every query started a fresh process with empty caches.
+- **S3, SF1, cold process, memory cache only.** The geometric mean is 1.20× native DuckDB reading a `.duckdb` file through HTTPFS, ranging from 0.92× to 1.58×. Every query started a fresh process with empty caches, and the client in Taipei read over the internet from a bucket in `ap-east-2`.
 - **Writing to S3, SF1 `lineitem`.** Writing directly through the extension reached 0.95× the throughput of writing natively to local disk and uploading the file with the AWS CLI. You get the same result, without the local copy or the upload step.
 
 Per-query tables and the full method are in [`benchmark.md`](https://github.com/dentiny/duckdb-object-storage/blob/main/benchmark.md).
@@ -250,7 +250,7 @@ This isn't free, and we'd rather tell you here than have you find out in product
 - **Readers can lag by about ten seconds.** They're always consistent, but not always current. That includes a `DETACH`/`ATTACH` cycle in the same process, which reuses the cached reader.
 - **The writer does background work.** SlateDB's compaction and garbage collection run inside the writer process and use its CPU, memory and request budget.
 - **Local-disk writes are slow.** Building SF10 `lineitem` and checkpointing ran at 0.19× native throughput. On S3 the gap disappears, because native DuckDB has to upload afterwards anyway, but on local disk it's the biggest cost we have. Logging every commit twice is a likely part of it; see "What comes next."
-- **Cold S3 reads are about 20% slower** than native DuckDB reading a `.duckdb` file over HTTPFS, with the worst query at 1.58×.
+- **Cold S3 reads are about 20% slower** than native DuckDB reading a `.duckdb` file over HTTPFS, with the worst query at 1.58×. Closing this gap is first on the roadmap.
 - **The bucket doesn't hold a `.duckdb` file.** It holds SlateDB SSTs, WAL objects and manifests. You can't `aws s3 cp` the database somewhere and open it with stock DuckDB. To get data out, attach both databases and use `COPY FROM DATABASE` or `EXPORT DATABASE`. To bring an existing database in, copy it the same way.
 - **It's DuckDB-only.** If Spark and Trino need to read the same tables, that's what Iceberg and DuckLake are for.
 - **Directory listing isn't implemented yet.** `Glob`, `ListFiles` and `DirectoryExists` are missing, so features that list `duckdb_objfs://` directories don't work yet.
@@ -258,7 +258,18 @@ This isn't free, and we'd rather tell you here than have you find out in product
 
 ## What comes next
 
-Three of the next steps are design changes rather than tuning, so they get more than a bullet.
+Four of the next steps are big enough to get more than a bullet. Performance comes first.
+
+### Closing the performance gap
+
+Performance is the main thing to work on next. Two numbers stand out: local-disk writes run at 0.19× native throughput, and cold reads from S3 are about 20% slower than native DuckDB over HTTPFS, up to 1.58× on short queries. We haven't profiled every query yet, so the first step is to count requests and bytes per query with `duckdb_objfs_io_stats()` and see where the time goes. The plan from there:
+
+- **Fewer serial round trips on cold reads.** A fresh process has to read SlateDB's manifest and SST indexes and filters before it can fetch any data. On a high-latency link those round trips add up, which is why short queries suffer most: Q16 gets about 200 ms slower on 370 ms. Loading that metadata in parallel on attach, and warming the cache, should take most of it off the critical path.
+- **Wider, smarter reads for large scans.** Raise fetch concurrency and read-ahead beyond today's 4 tasks and 4 MiB, and prefetch along DuckDB's scan pattern instead of guessing from offsets.
+- **Better persistent-cache defaults**, so a restarted process doesn't start completely cold.
+- **Faster writes.** The single WAL below is the biggest lever. Beyond it: fewer copies of staged chunks, batching across file handles, and SlateDB flush and compaction settings tuned for DuckDB's write pattern.
+
+The goal is to match HTTPFS on cold reads and native DuckDB on local writes.
 
 ### A strong consistency mode
 
@@ -290,8 +301,6 @@ There's a catch. DuckDB constructs `SingleFileBlockManager` directly inside its 
 
 ### Also on the list
 
-- **Faster local writes.** Beyond the single WAL: fewer copies of staged chunks, batching across file handles, and SlateDB flush and compaction settings tuned for DuckDB's write pattern.
-- **Faster remote reads.** Prefetching that follows DuckDB's scan pattern, better persistent-cache defaults, and warming the cache on attach.
 - **Fail-fast writer exclusivity.** A second read-write attach should be rejected right away, not fenced later.
 - **Snapshot pinning.** Let a query, or every worker in a distributed query, read one named committed version.
 - **A configurable manifest polling interval** for readers that don't need the strong mode but want fresher data than the default.
@@ -317,30 +326,3 @@ ATTACH 'duckdb_objfs://hello.db' AS db;   -- after the S3 secret and settings fr
 ```
 
 Source, issues and benchmarks are on [GitHub](https://github.com/dentiny/duckdb-object-storage).
-
-## Appendix: reproducing the benchmarks
-
-The read benchmark compares native DuckDB with the extension on TPC-H. It builds a release binary, generates data with `dbgen`, and records DuckDB's JSON profiles per query.
-
-```sh
-# Local: memory and local-disk backends, SF10, Q1–Q22
-python3 scripts/run_read_benchmarks.py --scale-factor 10 --runs 5
-
-# S3: SF1, a fresh process per query, three runs, no warm-up
-python3 scripts/run_read_benchmarks.py --remote --scale-factor 1 \
-  --s3-bucket <bucket> --s3-region <region> --aws-profile <profile>
-
-# Writes: CREATE TABLE AS SELECT of lineitem plus CHECKPOINT
-python3 scripts/run_write_benchmarks.py --local --scale-factor 10
-python3 scripts/run_write_benchmarks.py --remote \
-  --s3-bucket <bucket> --s3-region <region> --aws-profile <profile>
-```
-
-Setup for the published numbers:
-
-- **Client:** Apple M4 (10 cores, 16 GB), DuckDB v1.5.5, default thread count and memory limit.
-- **Local reads:** SF10, one warm-up and five measured runs per query.
-- **S3 reads:** SF1, with the client in Taipei reading over the internet from a bucket in `ap-east-2`, three cold-process runs per query. The extension used its default in-memory caches with the persistent cache disabled. Native DuckDB used HTTPFS with its external file cache enabled, starting empty in each process.
-- **Writes:** three fresh databases per backend. Source data is generated in memory before timing. Native S3 delivery includes the upload with the AWS CLI.
-
-Local SF10 and remote SF1 are separate runs at different scale factors and shouldn't be compared directly. This is TPC-H, not a promise about your workload.
