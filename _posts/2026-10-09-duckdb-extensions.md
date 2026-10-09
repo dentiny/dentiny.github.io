@@ -1,5 +1,5 @@
 ---
-title: "Making remote data feel local in DuckDB: 19 extensions, 2.2 million downloads"
+title: "My DuckDB extensions: caching, storage, and everything around remote data"
 date: 2026-10-09 00:00:00 -0700
 description: "Nineteen DuckDB community extensions for caching, storage, accessibility, IO resilience and observability: what each one does, how they fit together, and how many people use them."
 tags: [DuckDB, Extensions, Storage, Caching]
