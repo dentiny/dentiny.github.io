@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" width="1000" height="420" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8C959F"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="420" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">A reader jumps between committed versions, never in between</text>
+
+  <!-- Writer timeline -->
+  <text x="40" y="126" font-size="16" font-weight="700" fill="#1F2328">Writer</text>
+  <line x1="130" y1="120" x2="960" y2="120" stroke="#D8D3C4" stroke-width="2" marker-end="url(#arrow)"/>
+  <g font-size="12" text-anchor="middle">
+    <rect x="132" y="104" width="76" height="32" rx="6" fill="#DDE8FF" stroke="#7FA6EE"/>
+    <text x="170" y="125" fill="#1F2328" font-weight="600">original</text>
+    <rect x="250" y="104" width="76" height="32" rx="6" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="288" y="125" fill="#57606A">rewrite 1</text>
+    <rect x="360" y="104" width="76" height="32" rx="6" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="398" y="125" fill="#57606A">rewrite 2</text>
+    <rect x="470" y="104" width="76" height="32" rx="6" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="508" y="125" fill="#57606A">rewrite 3</text>
+    <rect x="580" y="104" width="76" height="32" rx="6" fill="#FFF1C2" stroke="#E3B341"/>
+    <text x="618" y="125" fill="#1F2328" font-weight="600">rewrite 4</text>
+    <rect x="690" y="104" width="76" height="32" rx="6" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="728" y="125" fill="#57606A">rewrite 5</text>
+    <rect x="800" y="104" width="76" height="32" rx="6" fill="#E3F4E6" stroke="#7CC08A"/>
+    <text x="838" y="125" fill="#1F2328" font-weight="600">rewrite 6</text>
+  </g>
+  <text x="545" y="88" font-size="13" text-anchor="middle" fill="#57606A">each box is one committed checkpoint of a 40-million-row table</text>
+
+  <!-- Refresh lines -->
+  <g stroke="#8C959F" stroke-width="1.5" stroke-dasharray="5 4" fill="none" marker-end="url(#arrow)">
+    <path d="M 640 140 L 676 238"/>
+    <path d="M 860 140 L 896 238"/>
+  </g>
+  <g font-size="12" fill="#57606A" text-anchor="middle">
+    <text x="690" y="186">refresh</text>
+    <text x="910" y="186">refresh</text>
+  </g>
+
+  <!-- Reader timeline -->
+  <text x="40" y="266" font-size="16" font-weight="700" fill="#1F2328">Reader</text>
+  <text x="40" y="286" font-size="12" fill="#57606A">READ_ONLY</text>
+  <rect x="132" y="246" width="548" height="30" rx="6" fill="#DDE8FF" stroke="#7FA6EE"/>
+  <rect x="680" y="246" width="220" height="30" rx="6" fill="#FFF1C2" stroke="#E3B341"/>
+  <rect x="900" y="246" width="60" height="30" rx="6" fill="#E3F4E6" stroke="#7CC08A"/>
+  <g font-size="13" font-weight="600" fill="#1F2328" text-anchor="middle">
+    <text x="406" y="266">every sum matches the original</text>
+    <text x="790" y="266">matches rewrite 4</text>
+    <text x="930" y="266">rw 6</text>
+  </g>
+  <g fill="#1F2328">
+    <circle cx="180" cy="300" r="4"/><circle cx="260" cy="300" r="4"/><circle cx="340" cy="300" r="4"/><circle cx="420" cy="300" r="4"/><circle cx="500" cy="300" r="4"/><circle cx="580" cy="300" r="4"/><circle cx="660" cy="300" r="4"/>
+    <circle cx="740" cy="300" r="4"/><circle cx="820" cy="300" r="4"/><circle cx="930" cy="300" r="4"/>
+  </g>
+  <text x="132" y="326" font-size="12" fill="#57606A">&#9679; one SUM over the table, re-read from storage each time</text>
+
+  <text x="40" y="374" font-size="15" font-weight="600" fill="#1A7F37">No sum ever mixed blocks from two versions.</text>
+  <text x="40" y="398" font-size="13" fill="#57606A">Measured with two processes; timing is illustrative. Readers refresh when they poll the manifest, about every 10 s.</text>
+</svg>
