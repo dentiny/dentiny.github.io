@@ -4,7 +4,10 @@ layout: default
 <article class="post-page">
   <a class="back-link" href="{{ '/archive/' | relative_url }}">← All posts</a>
   <header class="page-header">
-    <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%b %-d, %Y' }}</time>
+    <div class="post-meta">
+      <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%b %-d, %Y' }}</time>
+      · {% include read-time.html content=content %}
+    </div>
     <h1>{{ page.title | escape }}</h1>
   </header>
   <div class="prose">{{ content }}</div>
