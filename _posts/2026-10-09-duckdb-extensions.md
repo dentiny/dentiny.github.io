@@ -14,12 +14,13 @@ That's the pattern behind everything in this post. Since March 2025, my collabor
 **TL;DR**
 
 - **Small extensions that compose.** Each one fixes a single problem, so you load only what you need.
-- **Six highlights:**
+- **Seven highlights:**
   - [`cache_httpfs`](#cache-httpfs): a persistent cache that reads S3 data up to 345× faster
   - [`query_condition_cache`](#query-condition-cache): a predicate cache that runs repeated queries up to 314× faster
   - [`cache_prewarm`](#cache-prewarm): warms data before the first query
   - [`lance_conversion`](#lance-conversion): turns any query into an indexed Lance dataset in one statement
   - [`duckherder`](#duckherder): runs your SQL on remote servers
+  - [`duckdb_object_storage`](#duckdb-object-storage): a writable DuckDB database on S3, with any number of read-only readers
   - [`duckdb_opendalfs`](#duckdb-opendalfs): one extension for many storage backends
 - **I'm looking for feature requests and collaborations.** See [open problems](#lets-build-together), or email me at [dentinyhao@gmail.com](mailto:dentinyhao@gmail.com).
 
@@ -59,7 +60,14 @@ Two kinds of problems get my attention.
 
 ![Pain points of remote data mapped to the extensions that fix them](/assets/images/duckdb-extensions/pain-to-fix.png)
 
-**Connections to the outside world that don't belong in DuckDB's core.** DuckDB keeps its core small and free of external dependencies, which is right for the engine. But users still need to read XZ-compressed CSVs, write Lance datasets, reach WebDAV and SFTP, or keep a database in SlateDB. Those bring heavy dependencies, such as a Rust Lance writer, Apache OpenDAL or SlateDB, and they change faster than DuckDB's release cycle. An extension is the right home for them: it ships on its own schedule, and only the people who need it pay for it.
+**Extending DuckDB's reach to other systems.** These rely on libraries that don't belong in DuckDB's core, so they live as extensions:
+
+- `duckdb_opendalfs`: GCS, Azure Blob, Hugging Face, WebDAV, SFTP and more, through Apache OpenDAL
+- `compression_fs`: LZ4, Snappy, Brotli, Bzip2 and XZ files
+- `lance_conversion`: Lance datasets
+- `duckdb_object_storage`: databases stored in SlateDB
+- `huggingface`: datasets on the Hugging Face Hub
+- `duckherder`: other DuckDB servers, over Arrow Flight
 
 ---
 
@@ -146,6 +154,27 @@ SELECT category, count(*) FROM dh.events GROUP BY ALL;
 
 It's experimental, a personal project, and not affiliated with DuckDB Labs. It's also the most ambitious item on this list.
 
+### [`duckdb_object_storage`](https://github.com/dentiny/duckdb-object-storage): a writable DuckDB database on object storage {#duckdb-object-storage}
+
+DuckDB can attach a `.duckdb` file on S3 read-only, but writing one has needed a local disk. This extension keeps the whole database in [SlateDB](https://slatedb.io/), including the write-ahead log and recovery files, on S3-compatible storage or local disk, behind a `duckdb_objfs://` path.
+
+```sql
+INSTALL duckdb_object_storage FROM community;
+LOAD cache_httpfs;   -- registers the S3 secret type
+LOAD duckdb_object_storage;
+
+CREATE SECRET (TYPE S3, KEY_ID '...', SECRET '...', REGION 'us-east-1', SCOPE 's3://my-bucket/duckdb-data');
+SET duckdb_objfs_backend = 's3';
+SET duckdb_objfs_bucket = 'my-bucket';
+SET duckdb_objfs_root = 'duckdb-data';
+
+ATTACH 'duckdb_objfs://analytics.db' AS analytics;
+CREATE TABLE analytics.items (i INTEGER);
+INSERT INTO analytics.items VALUES (1), (2);
+```
+
+One process writes. Any number of others can attach the same database `READ_ONLY` and see new commits within about 10 seconds. SlateDB's in-memory cache is on by default, a local disk cache is one setting away, and `duckdb_objfs_cache_stats()` and `duckdb_objfs_io_stats()` show what's happening. This is the storage layer `duckherder`'s one-writer, many-readers design is built toward.
+
 ### [`duckdb_opendalfs`](https://github.com/dentiny/duckdb-opendal-filesystem): one extension, many backends {#duckdb-opendalfs}
 
 Built on [Apache OpenDAL](https://opendal.apache.org/), it covers **S3-compatible stores, GCS, Azure Blob, Hugging Face, WebDAV, SFTP and more** through ordinary DuckDB secrets, with timeouts and retries on by default.
@@ -158,7 +187,7 @@ CREATE SECRET prod_gcs (TYPE opendal_gcs, SCOPE 'gcs://analytics', TOKEN '...');
 SELECT * FROM read_parquet('gcs://analytics/events.parquet');
 ```
 
-The other twelve extensions each get a one-line summary on the map at the top of this post.
+The other eleven extensions each get a one-line summary on the map at the top of this post.
 
 <details markdown="1">
 <summary>All 18 repositories</summary>
