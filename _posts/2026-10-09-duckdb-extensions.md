@@ -24,7 +24,7 @@ That's the pattern behind everything in this post. Since March 2025, my collabor
   - [`duckdb_opendalfs`](#duckdb-opendalfs): one extension for many storage backends
 - **I'm looking for feature requests and collaborations.** See [open problems](#lets-build-together), or email me at [dentinyhao@gmail.com](mailto:dentinyhao@gmail.com).
 
-![18 DuckDB community extensions grouped into five focus areas](/assets/images/duckdb-extensions/extension-map.png)
+![18 DuckDB community extensions grouped by what you need, with highlights and maturity badges](/assets/images/duckdb-extensions/extension-map.png)
 
 ---
 
@@ -75,9 +75,11 @@ Two kinds of problems get my attention.
 
 ## Highlights
 
+Each highlight follows the same pattern: what it fixes, a picture, the SQL to try it, and where it fits.
+
 ### [`cache_httpfs`](https://github.com/dentiny/duck-read-cache-fs): a persistent read cache for remote files {#cache-httpfs}
 
-DuckDB's built-in file cache lives in memory and disappears when the process exits. `cache_httpfs` is a drop-in replacement for `httpfs` that keeps **data blocks, metadata, file handles and glob results** on local disk, and fetches large reads in parallel.
+DuckDB's built-in file cache lives in memory and disappears when the process exits. `cache_httpfs` is a drop-in replacement for `httpfs` that keeps **data blocks, metadata, file handles and glob results** on local disk, and fetches large reads in parallel. With 1.6 million downloads, it has been in the community top 10 every archived week since March 2026.
 
 ![cache_httpfs benchmark: 10,681 ms with httpfs, 3,934 ms on first read, 31 ms cached](/assets/images/duckdb-extensions/cache-httpfs-benchmark.png)
 
@@ -89,13 +91,13 @@ SELECT count(*) FROM 's3://my-bucket/events/*.parquet';   -- cold: fetched from 
 SELECT count(*) FROM 's3://my-bucket/events/*.parquet';   -- warm: read from local disk
 ```
 
-Tiny random reads can be slightly slower because reads are aligned to cache blocks; lower `cache_httpfs_cache_block_size` if that's your workload. `SET cache_httpfs_type = 'noop'` turns caching off entirely.
-
-**1.6 million downloads.** It has been in the community top 10 every archived week since March 2026, and twice reached #2.
+**Best for** dashboards, notebooks and CI jobs that read the same remote files again and again. **Not for** tiny random reads, which pay for block alignment; lower `cache_httpfs_cache_block_size` if that's your workload.
 
 ### [`query_condition_cache`](https://github.com/dentiny/duckdb-query-condition-cache): a predicate cache {#query-condition-cache}
 
-Dashboards and log investigations run the same `WHERE` clauses all day. Zone maps rarely help with `LIKE` patterns or unsorted columns, so DuckDB scans again on every run. This extension remembers **which vectors matched a predicate** and skips the rest next time. The approach follows the SIGMOD '24 paper [*Predicate Caching*](https://dl.acm.org/doi/10.1145/3626246.3653395) and [ClickHouse's query condition cache](https://clickhouse.com/blog/introducing-the-clickhouse-query-condition-cache).
+Dashboards and log investigations run the same `WHERE` clauses all day. Zone maps rarely help with `LIKE` patterns or unsorted columns, so DuckDB scans again on every run. This extension remembers **which vectors matched a predicate** and skips the rest next time, following the SIGMOD '24 paper [*Predicate Caching*](https://dl.acm.org/doi/10.1145/3626246.3653395) and [ClickHouse's query condition cache](https://clickhouse.com/blog/introducing-the-clickhouse-query-condition-cache). On [HDFS logs](https://github.com/logpai/loghub/tree/master/HDFS) (58 million records), cache hits were **up to 29× faster** with a cold OS page cache and up to 14× with warm storage; [Andrew's write-up](https://andrewtangtang.github.io/writing/query-condition-cache/) has the design and full results.
+
+![Query condition cache on HDFS logs with a cold OS page cache: baseline, first query and cache hit across ten queries](/assets/images/duckdb-extensions/qcc-hdfs-benchmark.png)
 
 ```sql
 INSTALL query_condition_cache FROM community;
@@ -105,25 +107,35 @@ LOAD query_condition_cache;
 SELECT count(*) FROM logs WHERE level = 'ERROR' AND msg LIKE '%timeout%';
 ```
 
-![Query condition cache on HDFS logs with a cold OS page cache: baseline, first query and cache hit across ten queries](/assets/images/duckdb-extensions/qcc-hdfs-benchmark.png)
-
-On the [HDFS_v2 logs](https://github.com/logpai/loghub/tree/master/HDFS) (58 million records), cache hits ran selective queries **up to 29× faster** with a cold OS page cache, and up to 14× with warm storage. The first run pays for an extra scan to build the entry, and broad or tiny queries have little to skip. [Andrew's write-up](https://andrewtangtang.github.io/writing/query-condition-cache/) has the design and full results.
+**Best for** selective filters that repeat over native DuckDB tables. **Not for** one-off queries, since the first run pays for an extra scan to build the entry, or broad filters with little to skip. Parquet scans are on the roadmap.
 
 ### [`cache_prewarm`](https://github.com/dentiny/duckdb-cache-prewarm): `pg_prewarm` for DuckDB {#cache-prewarm}
 
 The first query after a restart shouldn't be the slow one. Modeled on PostgreSQL's `pg_prewarm`, this loads data before users arrive: into DuckDB's buffer pool, into the OS page cache, or, with `cache_httpfs`, from S3 to local disk.
 
+![cache_prewarm: after a restart, prewarm loads data into the buffer pool, page cache or local disk so the first query is served warm](/assets/images/duckdb-extensions/cache-prewarm-flow.png)
+
 ```sql
+INSTALL cache_prewarm FROM community;
+LOAD cache_prewarm;
+
 SELECT prewarm('events');                              -- buffer pool
 SELECT prewarm('events', 'read', '4GB');               -- OS page cache, capped at 4 GB
 SELECT prewarm_remote('s3://lake/events/*.parquet');   -- remote files, via cache_httpfs
 ```
 
+**Best for** long-running services and dashboards that restart and need a fast first query. **Not for** data much larger than memory: prewarming stops at 80% of the free buffer pool, so raise `memory_limit` or prewarm only the hot tables.
+
 ### [`lance_conversion`](https://github.com/dentiny/duckdb_lance_conversion): `COPY` any query to Lance {#lance-conversion}
+
+Getting data into [Lance](https://lancedb.github.io/lance/) usually means exporting files and running a separate conversion job. This extension makes it one `COPY` statement, with indexes built along the way. Released two weeks ago, it already gets about 800 downloads a week.
 
 ![Before: four steps to get data into Lance. With lance_conversion: one COPY statement](/assets/images/duckdb-extensions/lance-pipeline.png)
 
 ```sql
+INSTALL lance_conversion FROM community;
+LOAD lance_conversion;
+
 COPY (
   SELECT id, category, description, embedding, asset_uri
   FROM read_parquet('s3://lake/catalog/**/*.parquet')
@@ -137,11 +149,13 @@ COPY (
 );
 ```
 
-It also supports append, overwrite and random sampling, and it ships `read_huggingface` and `read_warc` readers. Released two weeks ago, it already gets about 800 downloads a week.
+**Best for** turning Parquet, JSON, Hugging Face datasets or WARC archives into indexed Lance datasets for search and ML. It also supports append, overwrite and random sampling. **Not for** Windows x64, Intel Macs or the browser yet; those builds are excluded.
 
 ### [`duckherder`](https://github.com/dentiny/duckdb-distributed-execution): remote and distributed execution {#duckherder}
 
-![duckherder architecture: a client sends SQL to a driver over Arrow Flight, workers execute partitions and store data on S3 through duckdb_object_storage](/assets/images/duckdb-extensions/duckherder-architecture.png)
+Attach a remote DuckDB server like a local database and keep writing the same SQL. A driver plans and partitions each query, workers execute the pieces, and results come back over Arrow Flight. In the target design, the driver owns a single writer on [`duckdb_object_storage`](#duckdb-object-storage) and every worker reads from S3.
+
+![duckherder architecture: a client sends SQL to a driver over Arrow Flight; workers execute partitions over data stored on S3 through duckdb_object_storage](/assets/images/duckdb-extensions/duckherder-architecture.png)
 
 ```sql
 INSTALL duckherder FROM community;
@@ -154,11 +168,13 @@ INSERT INTO dh.events VALUES (1, 'click'), (2, 'view'), (3, 'click');
 SELECT category, count(*) FROM dh.events GROUP BY ALL;
 ```
 
-The driver plans and partitions the query, workers execute the pieces, and results come back over Arrow Flight. The ObjFS layer is [`duckdb_object_storage`](#duckdb-object-storage), which puts the data on S3. It's experimental, a personal project, and not affiliated with DuckDB Labs. It's also the most ambitious item on this list.
+**Best for** experimenting with remote and distributed DuckDB without changing your SQL. **Not for** production yet: it's experimental, joins still run on the driver, and authentication and worker failover are open problems. It's a personal project, not affiliated with DuckDB Labs, and the most ambitious item on this list.
 
 ### [`duckdb_object_storage`](https://github.com/dentiny/duckdb-object-storage): a writable DuckDB database on object storage {#duckdb-object-storage}
 
-DuckDB can attach a `.duckdb` file on S3 read-only, but writing one has needed a local disk. This extension keeps the whole database in [SlateDB](https://slatedb.io/), including the write-ahead log and recovery files, on S3-compatible storage or local disk, behind a `duckdb_objfs://` path.
+DuckDB can attach a `.duckdb` file on S3 read-only, but writing one has needed a local disk. This extension keeps the whole database in [SlateDB](https://slatedb.io/), including the write-ahead log and recovery files, on S3-compatible storage or local disk, behind a `duckdb_objfs://` path. SlateDB's in-memory cache is on by default, a local disk cache is one setting away, and `duckdb_objfs_cache_stats()` and `duckdb_objfs_io_stats()` show what's happening.
+
+![duckdb_object_storage: one writer stores the database in SlateDB on S3 or local disk; many READ_ONLY readers see commits within about 10 seconds](/assets/images/duckdb-extensions/object-storage-flow.png)
 
 ```sql
 INSTALL duckdb_object_storage FROM community;
@@ -175,11 +191,13 @@ CREATE TABLE analytics.items (i INTEGER);
 INSERT INTO analytics.items VALUES (1), (2);
 ```
 
-One process writes. Any number of others can attach the same database `READ_ONLY` and see new commits within about 10 seconds. SlateDB's in-memory cache is on by default, a local disk cache is one setting away, and `duckdb_objfs_cache_stats()` and `duckdb_objfs_io_stats()` show what's happening. This is the storage layer `duckherder`'s one-writer, many-readers design is built toward.
+**Best for** one writer and any number of `READ_ONLY` readers sharing a database on S3, with no server to run. **Not for** multiple writers: there's no file locking yet, so a second writer takes over and the first only finds out when its next flush fails. Run a single writer.
 
 ### [`duckdb_opendalfs`](https://github.com/dentiny/duckdb-opendal-filesystem): one extension, many backends {#duckdb-opendalfs}
 
 Built on [Apache OpenDAL](https://opendal.apache.org/), it covers **S3-compatible stores, GCS, Azure Blob, Hugging Face, WebDAV, SFTP and more** through ordinary DuckDB secrets, with timeouts and retries on by default.
+
+![duckdb_opendalfs: plain SQL on gcs:// and other paths goes through Apache OpenDAL to S3, GCS, Azure Blob, Hugging Face, WebDAV, SFTP and more](/assets/images/duckdb-extensions/opendalfs-flow.png)
 
 ```sql
 INSTALL duckdb_opendalfs FROM community;
@@ -188,6 +206,8 @@ LOAD duckdb_opendalfs;
 CREATE SECRET prod_gcs (TYPE opendal_gcs, SCOPE 'gcs://analytics', TOKEN '...');
 SELECT * FROM read_parquet('gcs://analytics/events.parquet');
 ```
+
+**Best for** storage that DuckDB's built-in filesystems don't reach, and one secrets model across all of them. Pair it with `cache_httpfs` to cache any backend on local disk. **Not for** squeezing the last bit of read throughput yet: every read currently pays an extra memory copy ([DuckDB discussion #21546](https://github.com/duckdb/duckdb/discussions/21546)).
 
 The other eleven extensions each get a one-line summary on the map at the top of this post.
 
@@ -228,24 +248,24 @@ The other eleven extensions each get a one-line summary on the map at the top of
 <details markdown="1">
 <summary>Full table</summary>
 
-| Extension | Focus area | First release | Downloads |
+| Extension | Group | First release | Downloads |
 | --- | --- | --- | ---: |
-| `cache_httpfs` | Cache | 2025-03 | 1,598,643 |
+| `cache_httpfs` | Remote reads | 2025-03 | 1,598,643 |
 | `curl_httpfs` | Storage | 2025-09 | 270,239 |
-| `observefs` | Observability | 2025-09 | 76,867 |
-| `system_stats` | Observability | 2025-12 | 36,705 |
-| `httpfs_timeout_retry` | Resilience | 2026-02 | 29,850 |
-| `table_inspector` | Observability | 2026-02 | 28,452 |
-| `cache_prewarm` | Cache | 2026-02 | 27,240 |
-| `rate_limit_fs` | Resilience | 2026-02 | 26,884 |
-| `hedged_request_fs` | Resilience | 2026-02 | 26,797 |
-| `latency_injection_fs` | Resilience | 2026-03 | 25,527 |
-| `query_condition_cache` | Cache | 2026-04 | 18,626 |
-| `duckherder` | Accessibility | 2025-11 | 10,579 |
-| `query_limiter` | Observability | 2026-07 | 9,439 |
+| `observefs` | Observe | 2025-09 | 76,867 |
+| `system_stats` | Observe | 2025-12 | 36,705 |
+| `httpfs_timeout_retry` | Flaky IO | 2026-02 | 29,850 |
+| `table_inspector` | Observe | 2026-02 | 28,452 |
+| `cache_prewarm` | Remote reads | 2026-02 | 27,240 |
+| `rate_limit_fs` | Flaky IO | 2026-02 | 26,884 |
+| `hedged_request_fs` | Flaky IO | 2026-02 | 26,797 |
+| `latency_injection_fs` | Flaky IO | 2026-03 | 25,527 |
+| `query_condition_cache` | Remote reads | 2026-04 | 18,626 |
+| `duckherder` | Other systems | 2025-11 | 10,579 |
+| `query_limiter` | Observe | 2026-07 | 9,439 |
 | `duckdb_opendalfs` | Storage | 2026-07 | 8,764 |
-| `huggingface` | Accessibility | 2026-08 | 4,884 |
-| `lance_conversion` | Accessibility | 2026-09 | 1,832 |
+| `huggingface` | Other systems | 2026-08 | 4,884 |
+| `lance_conversion` | Other systems | 2026-09 | 1,832 |
 | `duckdb_object_storage` | Storage | 2026-09 | 345 |
 | `compression_fs` | Storage | 2026-09 | — |
 | **Total** | | | **2,201,673** |
