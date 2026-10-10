@@ -57,6 +57,7 @@ main { padding: 52px 0 64px; outline: none; }
 .page-header p { margin: 0; color: var(--muted); }
 time, .muted { color: var(--muted); }
 time { font-size: 13px; }
+.post-meta { color: var(--muted); font-size: 13px; }
 .post-entry { padding: 24px 0; border-top: 1px solid var(--line); }
 .post-entry h2 { font-size: 21px; font-weight: 500; line-height: 1.4; margin: 8px 0; }
 .post-entry p { color: var(--muted); font-size: 15px; margin: 0; }
@@ -72,7 +73,7 @@ time { font-size: 13px; }
 }
 .site-footer div { display: flex; gap: 20px; }
 .back-link { display: inline-block; color: var(--muted); font-size: 13px; margin-bottom: 36px; }
-.post-page .page-header time { display: block; margin-bottom: 12px; }
+.post-page .post-meta { margin-bottom: 12px; }
 .prose { overflow-wrap: anywhere; }
 .prose p { margin: 0 0 1.4em; }
 .prose h2, .prose h3 { line-height: 1.4; margin: 1.8em 0 .7em; font-weight: 600; }
