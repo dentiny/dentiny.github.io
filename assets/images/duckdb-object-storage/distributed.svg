@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" width="1000" height="500" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8C959F"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="500" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">Distributed DuckDB on one bucket</text>
+
+  <!-- Client -->
+  <rect x="40" y="170" width="190" height="84" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+  <text x="135" y="204" font-size="16" font-weight="700" text-anchor="middle" fill="#1F2328">Client</text>
+  <text x="135" y="228" font-size="13" text-anchor="middle" fill="#57606A">SQL session</text>
+
+  <line x1="234" y1="212" x2="290" y2="212" stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="262" y="200" font-size="12" text-anchor="middle" fill="#57606A">query</text>
+
+  <!-- Driver -->
+  <rect x="298" y="140" width="230" height="144" rx="10" fill="#FFF1C2" stroke="#E3B341"/>
+  <text x="413" y="172" font-size="16" font-weight="700" text-anchor="middle" fill="#1F2328">Driver</text>
+  <text x="413" y="198" font-size="13" text-anchor="middle" fill="#57606A">plans and partitions queries</text>
+  <text x="413" y="218" font-size="13" text-anchor="middle" fill="#57606A">merges partial results</text>
+  <rect x="330" y="234" width="166" height="34" rx="8" fill="#FFFDF7" stroke="#E3B341"/>
+  <text x="413" y="256" font-size="13" font-weight="700" text-anchor="middle" fill="#1F2328">the only writer</text>
+
+  <!-- Workers -->
+  <g font-size="15" text-anchor="middle">
+    <rect x="600" y="80" width="170" height="60" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="685" y="106" font-weight="700" fill="#1F2328">Worker 1</text>
+    <text x="685" y="126" font-size="12" fill="#57606A">READ_ONLY</text>
+    <rect x="600" y="182" width="170" height="60" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="685" y="208" font-weight="700" fill="#1F2328">Worker 2</text>
+    <text x="685" y="228" font-size="12" fill="#57606A">READ_ONLY</text>
+    <rect x="600" y="284" width="170" height="60" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="685" y="310" font-weight="700" fill="#1F2328">Worker N</text>
+    <text x="685" y="330" font-size="12" fill="#57606A">READ_ONLY</text>
+  </g>
+  <g stroke="#8C959F" stroke-width="2" fill="none" marker-end="url(#arrow)">
+    <path d="M 530 190 C 565 190, 565 110, 594 110"/>
+    <path d="M 530 212 L 594 212"/>
+    <path d="M 530 234 C 565 234, 565 314, 594 314"/>
+  </g>
+  <text x="685" y="368" font-size="12" text-anchor="middle" fill="#57606A">partitioned tasks out,</text>
+  <text x="685" y="384" font-size="12" text-anchor="middle" fill="#57606A">partial results back</text>
+
+  <!-- Bucket -->
+  <g>
+    <path d="M 830 140 L 830 290 A 65 14 0 0 0 960 290 L 960 140" fill="#DDE8FF" stroke="#7FA6EE"/>
+    <ellipse cx="895" cy="140" rx="65" ry="14" fill="#EEF3FF" stroke="#7FA6EE"/>
+    <text x="895" y="206" font-size="15" font-weight="700" text-anchor="middle" fill="#1F2328">Bucket</text>
+    <text x="895" y="228" font-size="12" text-anchor="middle" fill="#57606A">one database</text>
+  </g>
+  <g stroke="#8C959F" stroke-width="2" fill="none" marker-end="url(#arrow)">
+    <path d="M 774 110 C 800 110, 800 170, 824 170"/>
+    <path d="M 774 212 L 824 212"/>
+    <path d="M 774 314 C 800 314, 800 260, 824 260"/>
+  </g>
+  <path d="M 413 286 C 413 480, 895 480, 895 312" fill="none" stroke="#E3B341" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+  <text x="654" y="456" font-size="12" text-anchor="middle" fill="#8C7A4B">commits and checkpoints</text>
+</svg>
