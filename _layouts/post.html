@@ -6,7 +6,7 @@ layout: default
   <header class="page-header">
     <div class="post-meta">
       <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%b %-d, %Y' }}</time>
-      · {% include read-time.html content=content %}
+      <span aria-hidden="true">·</span> {% include read-time.html content=content %}
     </div>
     <h1>{{ page.title | escape }}</h1>
   </header>

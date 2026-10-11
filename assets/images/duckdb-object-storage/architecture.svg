@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="1000" height="600" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8C959F"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="600" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">Replace the disk, not the database</text>
+
+  <!-- Process frame -->
+  <rect x="40" y="70" width="600" height="500" rx="14" fill="none" stroke="#B9B2A0" stroke-dasharray="7 6"/>
+  <text x="60" y="94" font-size="14" font-weight="600" fill="#8C7A4B">ONE DUCKDB PROCESS</text>
+
+  <g font-size="16" text-anchor="middle">
+    <rect x="70" y="108" width="540" height="64" rx="10" fill="#FFF1C2" stroke="#E3B341"/>
+    <text x="340" y="135" font-weight="700" fill="#1F2328">DuckDB storage engine</text>
+    <text x="340" y="157" font-size="14" fill="#57606A">blocks, WAL, checkpoints, recovery &#8212; unchanged</text>
+
+    <rect x="70" y="200" width="540" height="64" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="340" y="227" font-weight="700" fill="#1F2328">duckdb_objfs:// filesystem (C++)</text>
+    <text x="340" y="249" font-size="14" fill="#57606A">implements DuckDB's FileSystem interface</text>
+
+    <rect x="70" y="292" width="540" height="64" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="340" y="319" font-weight="700" fill="#1F2328">Rust core</text>
+    <text x="340" y="341" font-size="14" fill="#57606A">logical files &#8594; block-aligned chunks and metadata</text>
+
+    <rect x="70" y="384" width="540" height="64" rx="10" fill="#E3F4E6" stroke="#7CC08A"/>
+    <text x="340" y="411" font-weight="700" fill="#1F2328">SlateDB</text>
+    <text x="340" y="433" font-size="14" fill="#57606A">LSM tree on object storage + in-memory and on-disk caches</text>
+
+    <rect x="70" y="476" width="540" height="64" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="340" y="503" font-weight="700" fill="#1F2328">OpenDAL</text>
+    <text x="340" y="525" font-size="14" fill="#57606A">one storage interface for every backend</text>
+  </g>
+
+  <!-- Inter-layer arrows and labels -->
+  <g stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)">
+    <line x1="340" y1="174" x2="340" y2="195"/>
+    <line x1="340" y1="266" x2="340" y2="287"/>
+    <line x1="340" y1="358" x2="340" y2="379"/>
+    <line x1="340" y1="450" x2="340" y2="471"/>
+  </g>
+  <g font-size="13" fill="#6E7781">
+    <text x="354" y="191">OpenFile, Read, Write, FileSync, MoveFile</text>
+    <text x="354" y="283">C FFI</text>
+    <text x="354" y="375">get, range scan, write batch, transaction</text>
+    <text x="354" y="467">object reads, writes, lists, deletes</text>
+  </g>
+
+  <!-- Backends -->
+  <text x="700" y="136" font-size="14" font-weight="600" fill="#8C7A4B">BACKENDS</text>
+  <g font-size="16" text-anchor="middle">
+    <rect x="700" y="152" width="260" height="76" rx="10" fill="#DDE8FF" stroke="#7FA6EE"/>
+    <text x="830" y="184" font-weight="700" fill="#1F2328">S3 and S3-compatible</text>
+    <text x="830" y="207" font-size="14" fill="#57606A">AWS S3, MinIO, &#8230;</text>
+
+    <rect x="700" y="262" width="260" height="76" rx="10" fill="#DDE8FF" stroke="#7FA6EE"/>
+    <text x="830" y="294" font-weight="700" fill="#1F2328">Local filesystem</text>
+    <text x="830" y="317" font-size="14" fill="#57606A">the default; for development</text>
+
+    <rect x="700" y="372" width="260" height="76" rx="10" fill="#DDE8FF" stroke="#7FA6EE"/>
+    <text x="830" y="404" font-weight="700" fill="#1F2328">Memory</text>
+    <text x="830" y="427" font-size="14" fill="#57606A">ephemeral; for tests</text>
+  </g>
+  <g stroke="#8C959F" stroke-width="2" fill="none" marker-end="url(#arrow)">
+    <path d="M 612 508 C 660 508, 650 190, 694 190"/>
+    <path d="M 612 508 C 660 508, 650 300, 694 300"/>
+    <path d="M 612 508 C 660 508, 650 410, 694 410"/>
+  </g>
+</svg>

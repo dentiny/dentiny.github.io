@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" width="1000" height="470" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8C959F"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="470" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">Fewer, larger, concurrent requests</text>
+  <text x="40" y="86" font-size="14" font-weight="600" fill="#8C7A4B">CHUNKS ONE DUCKDB READ NEEDS</text>
+
+  <!-- Chunk cells: needed = 3,4,5,9,12,13 -->
+  <g font-size="14" text-anchor="middle" font-family="'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace">
+    <rect x="40"  y="100" width="52" height="44" rx="6" fill="#F3F1EA" stroke="#E0DBCC"/><text x="66"  y="127" fill="#B0A999">0</text>
+    <rect x="97"  y="100" width="52" height="44" rx="6" fill="#F3F1EA" stroke="#E0DBCC"/><text x="123" y="127" fill="#B0A999">1</text>
+    <rect x="154" y="100" width="52" height="44" rx="6" fill="#F3F1EA" stroke="#E0DBCC"/><text x="180" y="127" fill="#B0A999">2</text>
+    <rect x="211" y="100" width="52" height="44" rx="6" fill="#FFF1C2" stroke="#E3B341"/><text x="237" y="127" fill="#1F2328">3</text>
+    <rect x="268" y="100" width="52" height="44" rx="6" fill="#FFF1C2" stroke="#E3B341"/><text x="294" y="127" fill="#1F2328">4</text>
+    <rect x="325" y="100" width="52" height="44" rx="6" fill="#FFF1C2" stroke="#E3B341"/><text x="351" y="127" fill="#1F2328">5</text>
+    <rect x="382" y="100" width="52" height="44" rx="6" fill="#F3F1EA" stroke="#E0DBCC"/><text x="408" y="127" fill="#B0A999">6</text>
+    <rect x="439" y="100" width="52" height="44" rx="6" fill="#F3F1EA" stroke="#E0DBCC"/><text x="465" y="127" fill="#B0A999">7</text>
+    <rect x="496" y="100" width="52" height="44" rx="6" fill="#F3F1EA" stroke="#E0DBCC"/><text x="522" y="127" fill="#B0A999">8</text>
+    <rect x="553" y="100" width="52" height="44" rx="6" fill="#FFF1C2" stroke="#E3B341"/><text x="579" y="127" fill="#1F2328">9</text>
+    <rect x="610" y="100" width="52" height="44" rx="6" fill="#F3F1EA" stroke="#E0DBCC"/><text x="636" y="127" fill="#B0A999">10</text>
+    <rect x="667" y="100" width="52" height="44" rx="6" fill="#F3F1EA" stroke="#E0DBCC"/><text x="693" y="127" fill="#B0A999">11</text>
+    <rect x="724" y="100" width="52" height="44" rx="6" fill="#FFF1C2" stroke="#E3B341"/><text x="750" y="127" fill="#1F2328">12</text>
+    <rect x="781" y="100" width="52" height="44" rx="6" fill="#FFF1C2" stroke="#E3B341"/><text x="807" y="127" fill="#1F2328">13</text>
+    <rect x="838" y="100" width="52" height="44" rx="6" fill="#F3F1EA" stroke="#E0DBCC"/><text x="864" y="127" fill="#B0A999">14</text>
+    <rect x="895" y="100" width="52" height="44" rx="6" fill="#F3F1EA" stroke="#E0DBCC"/><text x="921" y="127" fill="#B0A999">15</text>
+  </g>
+
+  <!-- Group brackets -->
+  <g stroke="#8C7A4B" stroke-width="2" fill="none">
+    <path d="M 211 154 L 211 162 L 377 162 L 377 154"/>
+    <path d="M 553 154 L 553 162 L 605 162 L 605 154"/>
+    <path d="M 724 154 L 724 162 L 833 162 L 833 154"/>
+  </g>
+  <g stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)">
+    <line x1="294" y1="164" x2="294" y2="194"/>
+    <line x1="579" y1="164" x2="579" y2="194"/>
+    <line x1="778" y1="164" x2="778" y2="194"/>
+  </g>
+
+  <!-- Requests -->
+  <g font-size="15" text-anchor="middle">
+    <rect x="204" y="200" width="180" height="52" rx="10" fill="#E3F4E6" stroke="#7CC08A"/>
+    <text x="294" y="231" font-weight="600" fill="#1F2328">range scan 3&#8211;5</text>
+    <rect x="519" y="200" width="120" height="52" rx="10" fill="#E3F4E6" stroke="#7CC08A"/>
+    <text x="579" y="231" font-weight="600" fill="#1F2328">get 9</text>
+    <rect x="688" y="200" width="180" height="52" rx="10" fill="#E3F4E6" stroke="#7CC08A"/>
+    <text x="778" y="231" font-weight="600" fill="#1F2328">range scan 12&#8211;13</text>
+  </g>
+  <text x="40" y="224" font-size="13" font-weight="600" fill="#57606A">in parallel</text>
+  <text x="40" y="242" font-size="12" fill="#8C959F">read-ahead &#8804; 4 MiB</text>
+
+  <g stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)">
+    <line x1="294" y1="254" x2="294" y2="290"/>
+    <line x1="579" y1="254" x2="579" y2="290"/>
+    <line x1="778" y1="254" x2="778" y2="290"/>
+  </g>
+
+  <!-- Cache and bucket -->
+  <rect x="160" y="296" width="760" height="56" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+  <text x="540" y="321" font-size="15" font-weight="700" text-anchor="middle" fill="#1F2328">In-memory block and metadata cache</text>
+  <text x="540" y="341" font-size="13" text-anchor="middle" fill="#57606A">512 MiB + 128 MiB by default, plus an optional on-disk cache</text>
+
+  <line x1="540" y1="354" x2="540" y2="384" stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="552" y="374" font-size="12" fill="#8C959F">only on a miss</text>
+
+  <rect x="400" y="390" width="280" height="50" rx="10" fill="#DDE8FF" stroke="#7FA6EE"/>
+  <text x="540" y="421" font-size="15" font-weight="700" text-anchor="middle" fill="#1F2328">Bucket</text>
+</svg>
