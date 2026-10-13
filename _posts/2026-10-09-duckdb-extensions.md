@@ -252,27 +252,27 @@ Archive totals sum the available [weekly snapshots](https://community-extensions
 <details markdown="1">
 <summary>Full table</summary>
 
-| Extension | Group | First release | Archive downloads | Latest rolling week |
-| --- | --- | --- | ---: | ---: |
-| `cache_httpfs` | Remote reads | 2025-03 | 1,738,009 | 56,068 |
-| `curl_httpfs` | Storage | 2025-09 | 295,759 | 3,653 |
-| `observefs` | Observe | 2025-09 | 81,036 | 2,486 |
-| `system_stats` | Observe | 2025-12 | 40,931 | 774 |
-| `httpfs_timeout_retry` | Flaky IO | 2026-02 | 30,289 | 1,020 |
-| `table_inspector` | Observe | 2026-02 | 28,790 | 923 |
-| `cache_prewarm` | Remote reads | 2026-02 | 28,080 | 896 |
-| `rate_limit_fs` | Flaky IO | 2026-02 | 27,831 | 773 |
-| `hedged_request_fs` | Flaky IO | 2026-02 | 27,269 | 810 |
-| `latency_injection_fs` | Flaky IO | 2026-03 | 25,402 | 774 |
-| `query_condition_cache` | Remote reads | 2026-04 | 18,544 | 777 |
-| `duckherder` | Other systems | 2025-11 | 14,809 | 699 |
-| `query_limiter` | Observe | 2026-07 | 9,339 | 715 |
-| `duckdb_opendalfs` | Storage | 2026-07 | 8,676 | 868 |
-| `huggingface` | Other systems | 2026-08 | 4,812 | 723 |
-| `lance_conversion` | Other systems | 2026-09 | 1,765 | 684 |
-| `duckdb_object_storage` | Storage | 2026-09 | 359 | 292 |
-| `compression_fs` | Storage | 2026-09 | — | — |
-| **Total reported** | | | **2,381,700** | **72,935** |
+| Extension | Group | First release | Archive downloads |
+| --- | --- | --- | ---: |
+| `cache_httpfs` | Remote reads | 2025-03 | 1,738,009 |
+| `curl_httpfs` | Storage | 2025-09 | 295,759 |
+| `observefs` | Observe | 2025-09 | 81,036 |
+| `system_stats` | Observe | 2025-12 | 40,931 |
+| `httpfs_timeout_retry` | Flaky IO | 2026-02 | 30,289 |
+| `table_inspector` | Observe | 2026-02 | 28,790 |
+| `cache_prewarm` | Remote reads | 2026-02 | 28,080 |
+| `rate_limit_fs` | Flaky IO | 2026-02 | 27,831 |
+| `hedged_request_fs` | Flaky IO | 2026-02 | 27,269 |
+| `latency_injection_fs` | Flaky IO | 2026-03 | 25,402 |
+| `query_condition_cache` | Remote reads | 2026-04 | 18,544 |
+| `duckherder` | Other systems | 2025-11 | 14,809 |
+| `query_limiter` | Observe | 2026-07 | 9,339 |
+| `duckdb_opendalfs` | Storage | 2026-07 | 8,676 |
+| `huggingface` | Other systems | 2026-08 | 4,812 |
+| `lance_conversion` | Other systems | 2026-09 | 1,765 |
+| `duckdb_object_storage` | Storage | 2026-09 | 359 |
+| `compression_fs` | Storage | 2026-09 | — |
+| **Total reported** | | | **2,381,700** |
 
 </details>
 
