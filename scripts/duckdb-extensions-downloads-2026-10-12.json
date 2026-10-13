@@ -1,0 +1,1256 @@
+{
+  "retrieved_at": "2026-10-13T01:43:40+00:00",
+  "methodology": "Sum available weekly archive snapshots from 2025 week 10 through 2026 week 41. Exclude the current week 42 rolling snapshot because it overlaps week 41. Missing weeks are not estimated; irregular historical snapshot intervals mean these are archive sums, not exact lifetime totals. Missing extension keys are unavailable, not zero downloads.",
+  "extensions": [
+    {
+      "name": "cache_httpfs",
+      "group": "Remote reads",
+      "first_release": "2025-03",
+      "highlight": true
+    },
+    {
+      "name": "curl_httpfs",
+      "group": "Storage",
+      "first_release": "2025-09",
+      "highlight": false
+    },
+    {
+      "name": "observefs",
+      "group": "Observe",
+      "first_release": "2025-09",
+      "highlight": false
+    },
+    {
+      "name": "system_stats",
+      "group": "Observe",
+      "first_release": "2025-12",
+      "highlight": false
+    },
+    {
+      "name": "httpfs_timeout_retry",
+      "group": "Flaky IO",
+      "first_release": "2026-02",
+      "highlight": false
+    },
+    {
+      "name": "table_inspector",
+      "group": "Observe",
+      "first_release": "2026-02",
+      "highlight": false
+    },
+    {
+      "name": "cache_prewarm",
+      "group": "Remote reads",
+      "first_release": "2026-02",
+      "highlight": true
+    },
+    {
+      "name": "rate_limit_fs",
+      "group": "Flaky IO",
+      "first_release": "2026-02",
+      "highlight": false
+    },
+    {
+      "name": "hedged_request_fs",
+      "group": "Flaky IO",
+      "first_release": "2026-02",
+      "highlight": false
+    },
+    {
+      "name": "latency_injection_fs",
+      "group": "Flaky IO",
+      "first_release": "2026-03",
+      "highlight": false
+    },
+    {
+      "name": "query_condition_cache",
+      "group": "Remote reads",
+      "first_release": "2026-04",
+      "highlight": true
+    },
+    {
+      "name": "duckherder",
+      "group": "Other systems",
+      "first_release": "2025-11",
+      "highlight": true
+    },
+    {
+      "name": "query_limiter",
+      "group": "Observe",
+      "first_release": "2026-07",
+      "highlight": false
+    },
+    {
+      "name": "duckdb_opendalfs",
+      "group": "Storage",
+      "first_release": "2026-07",
+      "highlight": true
+    },
+    {
+      "name": "huggingface",
+      "group": "Other systems",
+      "first_release": "2026-08",
+      "highlight": false
+    },
+    {
+      "name": "lance_conversion",
+      "group": "Other systems",
+      "first_release": "2026-09",
+      "highlight": true
+    },
+    {
+      "name": "duckdb_object_storage",
+      "group": "Storage",
+      "first_release": "2026-09",
+      "highlight": true
+    },
+    {
+      "name": "compression_fs",
+      "group": "Storage",
+      "first_release": "2026-09",
+      "highlight": false
+    }
+  ],
+  "archives": [
+    {
+      "year": 2025,
+      "week": 10,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/10.json",
+      "last_update": "2025-03-09T07:28:46Z",
+      "downloads": {
+        "cache_httpfs": 411
+      }
+    },
+    {
+      "year": 2025,
+      "week": 11,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/11.json",
+      "last_update": "2025-03-16T07:28:56Z",
+      "downloads": {
+        "cache_httpfs": 415
+      }
+    },
+    {
+      "year": 2025,
+      "week": 12,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/12.json",
+      "last_update": "2025-03-23T07:28:49Z",
+      "downloads": {
+        "cache_httpfs": 552
+      }
+    },
+    {
+      "year": 2025,
+      "week": 13,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/13.json",
+      "last_update": "2025-03-30T07:28:47Z",
+      "downloads": {
+        "cache_httpfs": 557
+      }
+    },
+    {
+      "year": 2025,
+      "week": 14,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/14.json",
+      "last_update": "2025-04-06T07:28:52Z",
+      "downloads": {
+        "cache_httpfs": 601
+      }
+    },
+    {
+      "year": 2025,
+      "week": 15,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/15.json",
+      "last_update": "2025-04-13T07:28:51Z",
+      "downloads": {
+        "cache_httpfs": 707
+      }
+    },
+    {
+      "year": 2025,
+      "week": 16,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/16.json",
+      "last_update": "2025-04-20T07:28:51Z",
+      "downloads": {
+        "cache_httpfs": 671
+      }
+    },
+    {
+      "year": 2025,
+      "week": 17,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/17.json",
+      "last_update": "2025-04-27T07:28:54Z",
+      "downloads": {
+        "cache_httpfs": 738
+      }
+    },
+    {
+      "year": 2025,
+      "week": 18,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/18.json",
+      "last_update": "2025-05-04T07:28:57Z",
+      "downloads": {
+        "cache_httpfs": 798
+      }
+    },
+    {
+      "year": 2025,
+      "week": 19,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/19.json",
+      "last_update": "2025-05-11T07:28:56Z",
+      "downloads": {
+        "cache_httpfs": 838
+      }
+    },
+    {
+      "year": 2025,
+      "week": 20,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/20.json",
+      "last_update": "2025-05-18T07:28:55Z",
+      "downloads": {
+        "cache_httpfs": 869
+      }
+    },
+    {
+      "year": 2025,
+      "week": 21,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/21.json",
+      "last_update": "2025-05-21T07:28:50Z",
+      "downloads": {
+        "cache_httpfs": 862
+      }
+    },
+    {
+      "year": 2025,
+      "week": 38,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/38.json",
+      "last_update": "2025-09-21T04:00:53.163Z",
+      "downloads": {
+        "observefs": 123
+      }
+    },
+    {
+      "year": 2025,
+      "week": 39,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/39.json",
+      "last_update": "2025-09-28T04:00:20.327Z",
+      "downloads": {
+        "cache_httpfs": 3587,
+        "observefs": 315
+      }
+    },
+    {
+      "year": 2025,
+      "week": 40,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/40.json",
+      "last_update": "2025-10-02T04:00:40.363Z",
+      "downloads": {
+        "cache_httpfs": 5441,
+        "curl_httpfs": 95,
+        "observefs": 361
+      }
+    },
+    {
+      "year": 2025,
+      "week": 46,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/46.json",
+      "last_update": "2025-11-16T23:59:13.729Z",
+      "downloads": {
+        "cache_httpfs": 5587,
+        "curl_httpfs": 705,
+        "observefs": 676,
+        "duckherder": 674
+      }
+    },
+    {
+      "year": 2025,
+      "week": 47,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/47.json",
+      "last_update": "2025-11-23T23:59:11.687Z",
+      "downloads": {
+        "cache_httpfs": 10314,
+        "curl_httpfs": 696,
+        "observefs": 736,
+        "duckherder": 682
+      }
+    },
+    {
+      "year": 2025,
+      "week": 48,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/48.json",
+      "last_update": "2025-11-30T23:59:19.964Z",
+      "downloads": {
+        "cache_httpfs": 11862,
+        "curl_httpfs": 751,
+        "observefs": 733,
+        "duckherder": 722
+      }
+    },
+    {
+      "year": 2025,
+      "week": 49,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/49.json",
+      "last_update": "2025-12-07T04:00:55.017Z",
+      "downloads": {
+        "cache_httpfs": 10835,
+        "curl_httpfs": 678,
+        "observefs": 664,
+        "system_stats": 406,
+        "duckherder": 685
+      }
+    },
+    {
+      "year": 2025,
+      "week": 50,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/50.json",
+      "last_update": "2025-12-14T04:00:47.203Z",
+      "downloads": {
+        "cache_httpfs": 4365,
+        "curl_httpfs": 2349,
+        "observefs": 674,
+        "system_stats": 503,
+        "duckherder": 655
+      }
+    },
+    {
+      "year": 2025,
+      "week": 51,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/51.json",
+      "last_update": "2025-12-21T04:01:03.747Z",
+      "downloads": {
+        "cache_httpfs": 3435,
+        "curl_httpfs": 1215,
+        "observefs": 541,
+        "system_stats": 518,
+        "duckherder": 528
+      }
+    },
+    {
+      "year": 2025,
+      "week": 52,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2025/52.json",
+      "last_update": "2025-12-28T04:00:21.573Z",
+      "downloads": {
+        "cache_httpfs": 2270,
+        "curl_httpfs": 707,
+        "observefs": 492,
+        "system_stats": 458,
+        "duckherder": 475
+      }
+    },
+    {
+      "year": 2026,
+      "week": 1,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/1.json",
+      "last_update": "2026-01-04T04:00:25.910Z",
+      "downloads": {
+        "cache_httpfs": 3573,
+        "curl_httpfs": 510,
+        "observefs": 485,
+        "system_stats": 525,
+        "duckherder": 452
+      }
+    },
+    {
+      "year": 2026,
+      "week": 2,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/2.json",
+      "last_update": "2026-01-11T04:00:38.992Z",
+      "downloads": {
+        "cache_httpfs": 5400,
+        "curl_httpfs": 860,
+        "observefs": 482,
+        "system_stats": 471,
+        "duckherder": 492
+      }
+    },
+    {
+      "year": 2026,
+      "week": 3,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/3.json",
+      "last_update": "2026-01-18T04:00:48.480Z",
+      "downloads": {
+        "cache_httpfs": 7097,
+        "curl_httpfs": 1139,
+        "observefs": 523,
+        "system_stats": 506,
+        "duckherder": 530
+      }
+    },
+    {
+      "year": 2026,
+      "week": 4,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/4.json",
+      "last_update": "2026-01-25T04:00:57.130Z",
+      "downloads": {
+        "cache_httpfs": 10348,
+        "curl_httpfs": 1521,
+        "observefs": 573,
+        "system_stats": 557,
+        "duckherder": 570
+      }
+    },
+    {
+      "year": 2026,
+      "week": 5,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/5.json",
+      "last_update": "2026-02-01T04:00:22.050Z",
+      "downloads": {
+        "cache_httpfs": 12821,
+        "curl_httpfs": 2542,
+        "observefs": 637,
+        "system_stats": 647,
+        "duckherder": 669
+      }
+    },
+    {
+      "year": 2026,
+      "week": 6,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/6.json",
+      "last_update": "2026-02-08T04:00:30.799Z",
+      "downloads": {
+        "cache_httpfs": 13931,
+        "curl_httpfs": 3413,
+        "observefs": 2405,
+        "system_stats": 476,
+        "rate_limit_fs": 180,
+        "duckherder": 457
+      }
+    },
+    {
+      "year": 2026,
+      "week": 7,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/7.json",
+      "last_update": "2026-02-15T04:00:18.263Z",
+      "downloads": {
+        "cache_httpfs": 16147,
+        "curl_httpfs": 6465,
+        "observefs": 348,
+        "system_stats": 360,
+        "cache_prewarm": 235,
+        "rate_limit_fs": 224,
+        "duckherder": 342
+      }
+    },
+    {
+      "year": 2026,
+      "week": 8,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/8.json",
+      "last_update": "2026-02-22T04:00:56.122Z",
+      "downloads": {
+        "cache_httpfs": 20482,
+        "curl_httpfs": 3164,
+        "observefs": 453,
+        "system_stats": 417,
+        "httpfs_timeout_retry": 259,
+        "table_inspector": 338,
+        "cache_prewarm": 315,
+        "rate_limit_fs": 329,
+        "hedged_request_fs": 296,
+        "duckherder": 416
+      }
+    },
+    {
+      "year": 2026,
+      "week": 9,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/9.json",
+      "last_update": "2026-03-01T04:00:13.156Z",
+      "downloads": {
+        "cache_httpfs": 51173,
+        "curl_httpfs": 5277,
+        "observefs": 372,
+        "system_stats": 371,
+        "httpfs_timeout_retry": 315,
+        "table_inspector": 315,
+        "cache_prewarm": 326,
+        "rate_limit_fs": 335,
+        "hedged_request_fs": 315,
+        "duckherder": 398
+      }
+    },
+    {
+      "year": 2026,
+      "week": 10,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/10.json",
+      "last_update": "2026-03-08T04:00:11.602Z",
+      "downloads": {
+        "cache_httpfs": 65534,
+        "curl_httpfs": 3755,
+        "observefs": 422,
+        "system_stats": 417,
+        "httpfs_timeout_retry": 625,
+        "table_inspector": 363,
+        "cache_prewarm": 314,
+        "rate_limit_fs": 396,
+        "hedged_request_fs": 339,
+        "duckherder": 386
+      }
+    },
+    {
+      "year": 2026,
+      "week": 11,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/11.json",
+      "last_update": "2026-03-15T04:01:06.166Z",
+      "downloads": {
+        "cache_httpfs": 54236,
+        "curl_httpfs": 3724,
+        "observefs": 330,
+        "system_stats": 632,
+        "httpfs_timeout_retry": 1310,
+        "table_inspector": 518,
+        "cache_prewarm": 470,
+        "rate_limit_fs": 454,
+        "hedged_request_fs": 584,
+        "latency_injection_fs": 351,
+        "duckherder": 334
+      }
+    },
+    {
+      "year": 2026,
+      "week": 12,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/12.json",
+      "last_update": "2026-03-22T04:00:21.010Z",
+      "downloads": {
+        "cache_httpfs": 14041,
+        "curl_httpfs": 4320,
+        "observefs": 234,
+        "system_stats": 794,
+        "httpfs_timeout_retry": 858,
+        "table_inspector": 836,
+        "cache_prewarm": 783,
+        "rate_limit_fs": 784,
+        "hedged_request_fs": 766,
+        "latency_injection_fs": 771,
+        "duckherder": 241
+      }
+    },
+    {
+      "year": 2026,
+      "week": 13,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/13.json",
+      "last_update": "2026-03-29T04:00:36.415Z",
+      "downloads": {
+        "cache_httpfs": 13922,
+        "curl_httpfs": 3835,
+        "observefs": 183,
+        "system_stats": 844,
+        "httpfs_timeout_retry": 1511,
+        "table_inspector": 807,
+        "cache_prewarm": 675,
+        "rate_limit_fs": 813,
+        "hedged_request_fs": 842,
+        "latency_injection_fs": 817,
+        "duckherder": 186
+      }
+    },
+    {
+      "year": 2026,
+      "week": 14,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/14.json",
+      "last_update": "2026-04-05T04:00:19.730Z",
+      "downloads": {
+        "cache_httpfs": 22914,
+        "curl_httpfs": 93853,
+        "observefs": 454,
+        "system_stats": 806,
+        "httpfs_timeout_retry": 758,
+        "table_inspector": 808,
+        "cache_prewarm": 481,
+        "rate_limit_fs": 812,
+        "hedged_request_fs": 798,
+        "latency_injection_fs": 798,
+        "duckherder": 164
+      }
+    },
+    {
+      "year": 2026,
+      "week": 15,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/15.json",
+      "last_update": "2026-04-12T04:00:40.649Z",
+      "downloads": {
+        "cache_httpfs": 22306,
+        "curl_httpfs": 1889,
+        "observefs": 511,
+        "system_stats": 794,
+        "httpfs_timeout_retry": 770,
+        "table_inspector": 789,
+        "cache_prewarm": 426,
+        "rate_limit_fs": 798,
+        "hedged_request_fs": 782,
+        "latency_injection_fs": 779,
+        "duckherder": 137
+      }
+    },
+    {
+      "year": 2026,
+      "week": 16,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/16.json",
+      "last_update": "2026-04-19T04:00:35.763Z",
+      "downloads": {
+        "cache_httpfs": 14682,
+        "curl_httpfs": 4903,
+        "observefs": 585,
+        "system_stats": 1271,
+        "httpfs_timeout_retry": 779,
+        "table_inspector": 792,
+        "cache_prewarm": 810,
+        "rate_limit_fs": 802,
+        "hedged_request_fs": 784,
+        "latency_injection_fs": 796,
+        "query_condition_cache": 148,
+        "duckherder": 144
+      }
+    },
+    {
+      "year": 2026,
+      "week": 17,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/17.json",
+      "last_update": "2026-04-26T04:00:41.849Z",
+      "downloads": {
+        "cache_httpfs": 19714,
+        "curl_httpfs": 14052,
+        "observefs": 562,
+        "system_stats": 3832,
+        "httpfs_timeout_retry": 800,
+        "table_inspector": 798,
+        "cache_prewarm": 785,
+        "rate_limit_fs": 802,
+        "hedged_request_fs": 778,
+        "latency_injection_fs": 791,
+        "query_condition_cache": 350,
+        "duckherder": 140
+      }
+    },
+    {
+      "year": 2026,
+      "week": 18,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/18.json",
+      "last_update": "2026-05-03T04:01:00.148Z",
+      "downloads": {
+        "cache_httpfs": 34948,
+        "curl_httpfs": 3204,
+        "observefs": 602,
+        "system_stats": 1936,
+        "httpfs_timeout_retry": 816,
+        "table_inspector": 841,
+        "cache_prewarm": 815,
+        "rate_limit_fs": 833,
+        "hedged_request_fs": 820,
+        "latency_injection_fs": 809,
+        "query_condition_cache": 391,
+        "duckherder": 141
+      }
+    },
+    {
+      "year": 2026,
+      "week": 19,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/19.json",
+      "last_update": "2026-05-10T04:00:20.259Z",
+      "downloads": {
+        "cache_httpfs": 31679,
+        "curl_httpfs": 2718,
+        "observefs": 626,
+        "system_stats": 1862,
+        "httpfs_timeout_retry": 837,
+        "table_inspector": 840,
+        "cache_prewarm": 831,
+        "rate_limit_fs": 845,
+        "hedged_request_fs": 850,
+        "latency_injection_fs": 846,
+        "query_condition_cache": 464,
+        "duckherder": 117
+      }
+    },
+    {
+      "year": 2026,
+      "week": 20,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/20.json",
+      "last_update": "2026-05-17T04:00:46.406Z",
+      "downloads": {
+        "cache_httpfs": 38080,
+        "curl_httpfs": 2339,
+        "observefs": 600,
+        "system_stats": 1427,
+        "httpfs_timeout_retry": 751,
+        "table_inspector": 715,
+        "cache_prewarm": 722,
+        "rate_limit_fs": 707,
+        "hedged_request_fs": 701,
+        "latency_injection_fs": 721,
+        "query_condition_cache": 448,
+        "duckherder": 109
+      }
+    },
+    {
+      "year": 2026,
+      "week": 21,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/21.json",
+      "last_update": "2026-05-24T04:00:39.679Z",
+      "downloads": {
+        "cache_httpfs": 39145,
+        "curl_httpfs": 9786,
+        "observefs": 730,
+        "system_stats": 1625,
+        "httpfs_timeout_retry": 1284,
+        "table_inspector": 1132,
+        "cache_prewarm": 1244,
+        "rate_limit_fs": 1167,
+        "hedged_request_fs": 1242,
+        "latency_injection_fs": 1177,
+        "query_condition_cache": 1049,
+        "duckherder": 102
+      }
+    },
+    {
+      "year": 2026,
+      "week": 22,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/22.json",
+      "last_update": "2026-05-31T04:00:42.489Z",
+      "downloads": {
+        "cache_httpfs": 40952,
+        "curl_httpfs": 3098,
+        "observefs": 1156,
+        "system_stats": 1946,
+        "httpfs_timeout_retry": 1261,
+        "table_inspector": 1195,
+        "cache_prewarm": 1311,
+        "rate_limit_fs": 1262,
+        "hedged_request_fs": 1215,
+        "latency_injection_fs": 1258,
+        "query_condition_cache": 1205,
+        "duckherder": 88
+      }
+    },
+    {
+      "year": 2026,
+      "week": 23,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/23.json",
+      "last_update": "2026-06-07T04:00:19.325Z",
+      "downloads": {
+        "cache_httpfs": 40920,
+        "curl_httpfs": 1947,
+        "observefs": 582,
+        "system_stats": 745,
+        "httpfs_timeout_retry": 596,
+        "table_inspector": 603,
+        "cache_prewarm": 632,
+        "rate_limit_fs": 578,
+        "hedged_request_fs": 569,
+        "latency_injection_fs": 592,
+        "query_condition_cache": 500,
+        "duckherder": 83
+      }
+    },
+    {
+      "year": 2026,
+      "week": 24,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/24.json",
+      "last_update": "2026-06-14T04:01:02.943Z",
+      "downloads": {
+        "cache_httpfs": 42854,
+        "curl_httpfs": 3877,
+        "observefs": 1166,
+        "system_stats": 990,
+        "httpfs_timeout_retry": 764,
+        "table_inspector": 832,
+        "cache_prewarm": 892,
+        "rate_limit_fs": 797,
+        "hedged_request_fs": 780,
+        "latency_injection_fs": 815,
+        "query_condition_cache": 709,
+        "duckherder": 154
+      }
+    },
+    {
+      "year": 2026,
+      "week": 25,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/25.json",
+      "last_update": "2026-06-21T04:00:19.532Z",
+      "downloads": {
+        "cache_httpfs": 45127,
+        "curl_httpfs": 3581,
+        "observefs": 2372,
+        "system_stats": 1160,
+        "httpfs_timeout_retry": 902,
+        "table_inspector": 1727,
+        "cache_prewarm": 1191,
+        "rate_limit_fs": 1059,
+        "hedged_request_fs": 970,
+        "latency_injection_fs": 895,
+        "query_condition_cache": 820,
+        "duckherder": 197
+      }
+    },
+    {
+      "year": 2026,
+      "week": 26,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/26.json",
+      "last_update": "2026-06-28T04:00:18.979Z",
+      "downloads": {
+        "cache_httpfs": 28845,
+        "curl_httpfs": 2039,
+        "observefs": 1670,
+        "system_stats": 960,
+        "httpfs_timeout_retry": 899,
+        "table_inspector": 1017,
+        "cache_prewarm": 889,
+        "rate_limit_fs": 984,
+        "hedged_request_fs": 933,
+        "latency_injection_fs": 897,
+        "query_condition_cache": 783,
+        "duckherder": 87
+      }
+    },
+    {
+      "year": 2026,
+      "week": 27,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/27.json",
+      "last_update": "2026-07-05T04:00:34.795Z",
+      "downloads": {
+        "cache_httpfs": 20625,
+        "curl_httpfs": 2843,
+        "observefs": 1511,
+        "system_stats": 810,
+        "httpfs_timeout_retry": 837,
+        "table_inspector": 905,
+        "cache_prewarm": 833,
+        "rate_limit_fs": 929,
+        "hedged_request_fs": 867,
+        "latency_injection_fs": 736,
+        "query_condition_cache": 796,
+        "duckherder": 90
+      }
+    },
+    {
+      "year": 2026,
+      "week": 28,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/28.json",
+      "last_update": "2026-07-12T04:00:53.011Z",
+      "downloads": {
+        "cache_httpfs": 19830,
+        "curl_httpfs": 5940,
+        "observefs": 3809,
+        "system_stats": 686,
+        "httpfs_timeout_retry": 797,
+        "table_inspector": 799,
+        "cache_prewarm": 758,
+        "rate_limit_fs": 780,
+        "hedged_request_fs": 723,
+        "latency_injection_fs": 693,
+        "query_condition_cache": 613,
+        "duckherder": 82,
+        "query_limiter": 65
+      }
+    },
+    {
+      "year": 2026,
+      "week": 29,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/29.json",
+      "last_update": "2026-07-19T04:01:02.327Z",
+      "downloads": {
+        "cache_httpfs": 22788,
+        "curl_httpfs": 3125,
+        "observefs": 708,
+        "system_stats": 815,
+        "httpfs_timeout_retry": 775,
+        "table_inspector": 701,
+        "cache_prewarm": 1174,
+        "rate_limit_fs": 794,
+        "hedged_request_fs": 833,
+        "latency_injection_fs": 777,
+        "query_condition_cache": 862,
+        "duckherder": 85,
+        "query_limiter": 526
+      }
+    },
+    {
+      "year": 2026,
+      "week": 30,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/30.json",
+      "last_update": "2026-07-26T04:00:15.753Z",
+      "downloads": {
+        "cache_httpfs": 59094,
+        "curl_httpfs": 3965,
+        "observefs": 1379,
+        "system_stats": 831,
+        "httpfs_timeout_retry": 1004,
+        "table_inspector": 893,
+        "cache_prewarm": 1061,
+        "rate_limit_fs": 875,
+        "hedged_request_fs": 872,
+        "latency_injection_fs": 944,
+        "query_condition_cache": 768,
+        "duckherder": 83,
+        "query_limiter": 456,
+        "duckdb_opendalfs": 587
+      }
+    },
+    {
+      "year": 2026,
+      "week": 31,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/31.json",
+      "last_update": "2026-08-02T04:00:45.582Z",
+      "downloads": {
+        "cache_httpfs": 77238,
+        "curl_httpfs": 2432,
+        "observefs": 1079,
+        "system_stats": 768,
+        "httpfs_timeout_retry": 907,
+        "table_inspector": 906,
+        "cache_prewarm": 819,
+        "rate_limit_fs": 938,
+        "hedged_request_fs": 801,
+        "latency_injection_fs": 774,
+        "query_condition_cache": 746,
+        "duckherder": 88,
+        "query_limiter": 543,
+        "duckdb_opendalfs": 525
+      }
+    },
+    {
+      "year": 2026,
+      "week": 32,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/32.json",
+      "last_update": "2026-08-09T04:00:36.537Z",
+      "downloads": {
+        "cache_httpfs": 77520,
+        "curl_httpfs": 2341,
+        "observefs": 1046,
+        "system_stats": 878,
+        "httpfs_timeout_retry": 965,
+        "table_inspector": 946,
+        "cache_prewarm": 846,
+        "rate_limit_fs": 812,
+        "hedged_request_fs": 804,
+        "latency_injection_fs": 827,
+        "query_condition_cache": 776,
+        "duckherder": 61,
+        "query_limiter": 596,
+        "duckdb_opendalfs": 639
+      }
+    },
+    {
+      "year": 2026,
+      "week": 33,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/33.json",
+      "last_update": "2026-08-16T04:00:17.597Z",
+      "downloads": {
+        "cache_httpfs": 79751,
+        "curl_httpfs": 9609,
+        "observefs": 4231,
+        "system_stats": 803,
+        "httpfs_timeout_retry": 788,
+        "table_inspector": 763,
+        "cache_prewarm": 794,
+        "rate_limit_fs": 778,
+        "hedged_request_fs": 756,
+        "latency_injection_fs": 777,
+        "query_condition_cache": 793,
+        "duckherder": 52,
+        "query_limiter": 688,
+        "duckdb_opendalfs": 640,
+        "huggingface": 186
+      }
+    },
+    {
+      "year": 2026,
+      "week": 34,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/34.json",
+      "last_update": "2026-08-23T04:00:56.010Z",
+      "downloads": {
+        "cache_httpfs": 79701,
+        "curl_httpfs": 4302,
+        "observefs": 9169,
+        "system_stats": 1020,
+        "httpfs_timeout_retry": 852,
+        "table_inspector": 868,
+        "cache_prewarm": 908,
+        "rate_limit_fs": 784,
+        "hedged_request_fs": 948,
+        "latency_injection_fs": 730,
+        "query_condition_cache": 877,
+        "duckherder": 30,
+        "query_limiter": 795,
+        "duckdb_opendalfs": 849,
+        "huggingface": 357
+      }
+    },
+    {
+      "year": 2026,
+      "week": 35,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/35.json",
+      "last_update": "2026-08-30T04:01:00.310Z",
+      "downloads": {
+        "cache_httpfs": 98104,
+        "curl_httpfs": 4143,
+        "observefs": 16781,
+        "system_stats": 667,
+        "httpfs_timeout_retry": 975,
+        "table_inspector": 716,
+        "cache_prewarm": 748,
+        "rate_limit_fs": 707,
+        "hedged_request_fs": 766,
+        "latency_injection_fs": 676,
+        "query_condition_cache": 590,
+        "duckherder": 25,
+        "query_limiter": 722,
+        "duckdb_opendalfs": 585,
+        "huggingface": 415
+      }
+    },
+    {
+      "year": 2026,
+      "week": 36,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/36.json",
+      "last_update": "2026-09-06T04:00:28.367Z",
+      "downloads": {
+        "cache_httpfs": 82674,
+        "curl_httpfs": 3467,
+        "observefs": 3587,
+        "system_stats": 753,
+        "httpfs_timeout_retry": 951,
+        "table_inspector": 703,
+        "cache_prewarm": 943,
+        "rate_limit_fs": 709,
+        "hedged_request_fs": 835,
+        "latency_injection_fs": 842,
+        "query_condition_cache": 688,
+        "duckherder": 29,
+        "query_limiter": 604,
+        "duckdb_opendalfs": 631,
+        "huggingface": 499
+      }
+    },
+    {
+      "year": 2026,
+      "week": 37,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/37.json",
+      "last_update": "2026-09-13T04:00:28.860Z",
+      "downloads": {
+        "cache_httpfs": 94100,
+        "curl_httpfs": 32299,
+        "observefs": 1892,
+        "system_stats": 824,
+        "httpfs_timeout_retry": 963,
+        "table_inspector": 897,
+        "cache_prewarm": 899,
+        "rate_limit_fs": 877,
+        "hedged_request_fs": 720,
+        "latency_injection_fs": 750,
+        "query_condition_cache": 701,
+        "duckherder": 28,
+        "query_limiter": 765,
+        "duckdb_opendalfs": 658,
+        "huggingface": 511
+      }
+    },
+    {
+      "year": 2026,
+      "week": 38,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/38.json",
+      "last_update": "2026-09-20T04:00:29.370Z",
+      "downloads": {
+        "cache_httpfs": 87439,
+        "curl_httpfs": 15106,
+        "observefs": 783,
+        "system_stats": 813,
+        "httpfs_timeout_retry": 881,
+        "table_inspector": 886,
+        "cache_prewarm": 912,
+        "rate_limit_fs": 1045,
+        "hedged_request_fs": 1057,
+        "latency_injection_fs": 925,
+        "query_condition_cache": 893,
+        "duckherder": 318,
+        "query_limiter": 1014,
+        "duckdb_opendalfs": 838,
+        "huggingface": 554
+      }
+    },
+    {
+      "year": 2026,
+      "week": 39,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/39.json",
+      "last_update": "2026-09-27T04:00:16.785Z",
+      "downloads": {
+        "cache_httpfs": 53582,
+        "curl_httpfs": 4279,
+        "observefs": 875,
+        "system_stats": 866,
+        "httpfs_timeout_retry": 1116,
+        "table_inspector": 1176,
+        "cache_prewarm": 1057,
+        "rate_limit_fs": 883,
+        "hedged_request_fs": 859,
+        "latency_injection_fs": 838,
+        "query_condition_cache": 863,
+        "duckherder": 632,
+        "query_limiter": 972,
+        "duckdb_opendalfs": 854,
+        "huggingface": 759,
+        "lance_conversion": 156
+      }
+    },
+    {
+      "year": 2026,
+      "week": 40,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/40.json",
+      "last_update": "2026-10-04T04:00:10.533Z",
+      "downloads": {
+        "cache_httpfs": 51785,
+        "curl_httpfs": 3102,
+        "observefs": 7251,
+        "system_stats": 1314,
+        "httpfs_timeout_retry": 1318,
+        "table_inspector": 1380,
+        "cache_prewarm": 1221,
+        "rate_limit_fs": 1129,
+        "hedged_request_fs": 1193,
+        "latency_injection_fs": 1172,
+        "query_condition_cache": 885,
+        "duckherder": 897,
+        "query_limiter": 827,
+        "duckdb_opendalfs": 947,
+        "huggingface": 766,
+        "lance_conversion": 886,
+        "duckdb_object_storage": 80
+      }
+    },
+    {
+      "year": 2026,
+      "week": 41,
+      "url": "https://community-extensions.duckdb.org/download-stats-weekly/2026/41.json",
+      "last_update": "2026-10-11T04:00:07.532Z",
+      "downloads": {
+        "cache_httpfs": 57192,
+        "curl_httpfs": 3799,
+        "observefs": 2557,
+        "system_stats": 827,
+        "httpfs_timeout_retry": 1065,
+        "table_inspector": 985,
+        "cache_prewarm": 960,
+        "rate_limit_fs": 830,
+        "hedged_request_fs": 871,
+        "latency_injection_fs": 828,
+        "query_condition_cache": 826,
+        "duckherder": 752,
+        "query_limiter": 766,
+        "duckdb_opendalfs": 923,
+        "huggingface": 765,
+        "lance_conversion": 723,
+        "duckdb_object_storage": 279
+      }
+    }
+  ],
+  "missing_archives": [
+    {
+      "year": 2025,
+      "week": 22
+    },
+    {
+      "year": 2025,
+      "week": 23
+    },
+    {
+      "year": 2025,
+      "week": 24
+    },
+    {
+      "year": 2025,
+      "week": 25
+    },
+    {
+      "year": 2025,
+      "week": 26
+    },
+    {
+      "year": 2025,
+      "week": 27
+    },
+    {
+      "year": 2025,
+      "week": 28
+    },
+    {
+      "year": 2025,
+      "week": 29
+    },
+    {
+      "year": 2025,
+      "week": 30
+    },
+    {
+      "year": 2025,
+      "week": 31
+    },
+    {
+      "year": 2025,
+      "week": 32
+    },
+    {
+      "year": 2025,
+      "week": 33
+    },
+    {
+      "year": 2025,
+      "week": 34
+    },
+    {
+      "year": 2025,
+      "week": 35
+    },
+    {
+      "year": 2025,
+      "week": 36
+    },
+    {
+      "year": 2025,
+      "week": 37
+    },
+    {
+      "year": 2025,
+      "week": 41
+    },
+    {
+      "year": 2025,
+      "week": 42
+    },
+    {
+      "year": 2025,
+      "week": 43
+    },
+    {
+      "year": 2025,
+      "week": 44
+    },
+    {
+      "year": 2025,
+      "week": 45
+    }
+  ],
+  "latest": {
+    "url": "https://community-extensions.duckdb.org/downloads-last-week.json",
+    "last_update": "2026-10-12T04:00:07.995Z",
+    "extension_count": 356,
+    "cache_httpfs_rank": 6,
+    "downloads": {
+      "cache_httpfs": 56068,
+      "curl_httpfs": 3653,
+      "observefs": 2486,
+      "system_stats": 774,
+      "httpfs_timeout_retry": 1020,
+      "table_inspector": 923,
+      "cache_prewarm": 896,
+      "rate_limit_fs": 773,
+      "hedged_request_fs": 810,
+      "latency_injection_fs": 774,
+      "query_condition_cache": 777,
+      "duckherder": 699,
+      "query_limiter": 715,
+      "duckdb_opendalfs": 868,
+      "huggingface": 723,
+      "lance_conversion": 684,
+      "duckdb_object_storage": 292
+    }
+  }
+}

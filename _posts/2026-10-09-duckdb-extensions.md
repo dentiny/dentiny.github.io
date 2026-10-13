@@ -7,9 +7,9 @@ tags: [DuckDB, Extensions, Storage, Caching]
 
 DuckDB is fast on a laptop SSD. Point it at S3 and you're dealing with round trips, tail latency, throttling and egress bills instead.
 
-In November 2024, a DuckDB user opened [an issue on `httpfs`](https://github.com/duckdb/duckdb-httpfs/issues/4) asking for a disk cache: querying S3 from a laptop was slow, and every query paid for egress again. That issue is still open. Four months later I shipped `cache_httpfs` as a community extension. Last week it was downloaded 58,798 times, fifth among roughly 360 community extensions.
+In November 2024, a DuckDB user opened [an issue on `httpfs`](https://github.com/duckdb/duckdb-httpfs/issues/4) asking for a disk cache: querying S3 from a laptop was slow, and every query paid for egress again. That issue is still open. Four months later I shipped `cache_httpfs` as a community extension. In the latest published rolling week, it was downloaded 56,068 times, sixth among 356 community extensions with reported downloads ([snapshot updated October 12, 2026, 04:00 UTC](https://community-extensions.duckdb.org/downloads-last-week.json)).
 
-That's the pattern behind everything in this post. Since March 2025, my collaborators and I have shipped 18 DuckDB extensions, downloaded more than 2.2 million times. Here's the short version.
+That's the pattern behind everything in this post. Since March 2025, my collaborators and I have shipped 18 DuckDB extensions, with more than 2.3 million downloads recorded in the available weekly archives. Here's the short version.
 
 **TL;DR**
 
@@ -79,7 +79,7 @@ Each highlight follows the same pattern: what it fixes, a picture, the SQL to tr
 
 ### [`cache_httpfs`](https://github.com/dentiny/duck-read-cache-fs): a persistent read cache for remote files {#cache-httpfs}
 
-DuckDB's built-in file cache lives in memory and disappears when the process exits. `cache_httpfs` is a drop-in replacement for `httpfs` that keeps **data blocks, metadata, file handles and glob results** on local disk, and fetches large reads in parallel. With 1.6 million downloads, it has been in the community top 10 every archived week since March 2026.
+DuckDB's built-in file cache lives in memory and disappears when the process exits. `cache_httpfs` is a drop-in replacement for `httpfs` that keeps **data blocks, metadata, file handles and glob results** on local disk, and fetches large reads in parallel. With more than 1.7 million downloads recorded in the available weekly archives, it has been in the community top 10 every archived week since March 2026.
 
 ![cache_httpfs benchmark: 10,681 ms with httpfs, 3,934 ms on first read, 31 ms cached](/assets/images/duckdb-extensions/cache-httpfs-benchmark.png)
 
@@ -128,7 +128,7 @@ SELECT prewarm_remote('s3://lake/events/*.parquet');   -- remote files, via cach
 
 ### [`lance_conversion`](https://github.com/dentiny/duckdb_lance_conversion): `COPY` any query to Lance {#lance-conversion}
 
-Getting data into [Lance](https://lancedb.github.io/lance/) usually means exporting files and running a separate conversion job. This extension makes it one `COPY` statement, with indexes built along the way. Released two weeks ago, it already gets about 800 downloads a week.
+Getting data into [Lance](https://lancedb.github.io/lance/) usually means exporting files and running a separate conversion job. This extension makes it one `COPY` statement, with indexes built along the way. Released in September 2026, it recorded 684 downloads in the latest published rolling week.
 
 ![Before: four steps to get data into Lance. With lance_conversion: one COPY statement](/assets/images/duckdb-extensions/lance-pipeline.png)
 
@@ -241,34 +241,38 @@ The other eleven extensions each get a one-line summary on the map at the top of
 
 ## By the numbers
 
-![Per-extension cumulative downloads, log scale](/assets/images/duckdb-extensions/downloads-by-extension.png)
+**Statistics refreshed October 12, 2026, at 18:43:40 PDT (October 13, 01:43:40 UTC).** The latest [rolling-week report](https://community-extensions.duckdb.org/downloads-last-week.json) was updated October 12 at 04:00:07 UTC; these are the latest official figures available at retrieval, rather than a live counter. The 18 extensions have **72,935 reported downloads in that rolling week**.
 
-![Weekly downloads stacked by focus area](/assets/images/duckdb-extensions/weekly-downloads.png)
+Archive totals sum the available [weekly snapshots](https://community-extensions.duckdb.org/download-stats-weekly/2026/41.json) from 2025 week 10 through 2026 week 41 (latest update: October 11, 2026, 04:00:07 UTC). The current week 42 report overlaps week 41, so it is shown separately and is not added to the archive totals. Missing weeks are not estimated, and some older snapshots were taken at irregular intervals: these sums are not exact lifetime totals. DuckDB's [download metrics](https://duckdb.org/community_extensions/download_metrics) estimate downloads across versions and platforms, not unique users. A dash means no published count; totals include only reported values. The [frozen data](https://github.com/dentiny/dentiny.github.io/blob/main/scripts/duckdb-extensions-downloads-2026-10-12.json) and [chart script](https://github.com/dentiny/dentiny.github.io/blob/main/scripts/plot-extension-downloads.py) make this refresh reproducible.
+
+![Per-extension downloads summed over available weekly archives through October 11, 2026; total 2,381,700, log scale](/assets/images/duckdb-extensions/downloads-by-extension.png)
+
+![Weekly archived downloads stacked by focus area through October 11, 2026; latest rolling week separately reports 72,935 downloads](/assets/images/duckdb-extensions/weekly-downloads.png)
 
 <details markdown="1">
 <summary>Full table</summary>
 
-| Extension | Group | First release | Downloads |
-| --- | --- | --- | ---: |
-| `cache_httpfs` | Remote reads | 2025-03 | 1,598,643 |
-| `curl_httpfs` | Storage | 2025-09 | 270,239 |
-| `observefs` | Observe | 2025-09 | 76,867 |
-| `system_stats` | Observe | 2025-12 | 36,705 |
-| `httpfs_timeout_retry` | Flaky IO | 2026-02 | 29,850 |
-| `table_inspector` | Observe | 2026-02 | 28,452 |
-| `cache_prewarm` | Remote reads | 2026-02 | 27,240 |
-| `rate_limit_fs` | Flaky IO | 2026-02 | 26,884 |
-| `hedged_request_fs` | Flaky IO | 2026-02 | 26,797 |
-| `latency_injection_fs` | Flaky IO | 2026-03 | 25,527 |
-| `query_condition_cache` | Remote reads | 2026-04 | 18,626 |
-| `duckherder` | Other systems | 2025-11 | 10,579 |
-| `query_limiter` | Observe | 2026-07 | 9,439 |
-| `duckdb_opendalfs` | Storage | 2026-07 | 8,764 |
-| `huggingface` | Other systems | 2026-08 | 4,884 |
-| `lance_conversion` | Other systems | 2026-09 | 1,832 |
-| `duckdb_object_storage` | Storage | 2026-09 | 345 |
-| `compression_fs` | Storage | 2026-09 | — |
-| **Total** | | | **2,201,673** |
+| Extension | Group | First release | Archive downloads | Latest rolling week |
+| --- | --- | --- | ---: | ---: |
+| `cache_httpfs` | Remote reads | 2025-03 | 1,738,009 | 56,068 |
+| `curl_httpfs` | Storage | 2025-09 | 295,759 | 3,653 |
+| `observefs` | Observe | 2025-09 | 81,036 | 2,486 |
+| `system_stats` | Observe | 2025-12 | 40,931 | 774 |
+| `httpfs_timeout_retry` | Flaky IO | 2026-02 | 30,289 | 1,020 |
+| `table_inspector` | Observe | 2026-02 | 28,790 | 923 |
+| `cache_prewarm` | Remote reads | 2026-02 | 28,080 | 896 |
+| `rate_limit_fs` | Flaky IO | 2026-02 | 27,831 | 773 |
+| `hedged_request_fs` | Flaky IO | 2026-02 | 27,269 | 810 |
+| `latency_injection_fs` | Flaky IO | 2026-03 | 25,402 | 774 |
+| `query_condition_cache` | Remote reads | 2026-04 | 18,544 | 777 |
+| `duckherder` | Other systems | 2025-11 | 14,809 | 699 |
+| `query_limiter` | Observe | 2026-07 | 9,339 | 715 |
+| `duckdb_opendalfs` | Storage | 2026-07 | 8,676 | 868 |
+| `huggingface` | Other systems | 2026-08 | 4,812 | 723 |
+| `lance_conversion` | Other systems | 2026-09 | 1,765 | 684 |
+| `duckdb_object_storage` | Storage | 2026-09 | 359 | 292 |
+| `compression_fs` | Storage | 2026-09 | — | — |
+| **Total reported** | | | **2,381,700** | **72,935** |
 
 </details>
 
