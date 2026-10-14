@@ -15,7 +15,7 @@ tags: [DuckDB, Distributed Systems, Object Storage]
 
 **In brief**
 
-- **Nothing to deploy but DuckDB.** The client, driver and workers are DuckDB processes with extensions loaded. There's no Spark, Ray or JVM, and no catalog service or metastore database.
+- **Nothing to deploy but DuckDB.** The client, driver and workers are DuckDB processes with extensions loaded. There's no Spark or JVM, and no catalog service or metastore database.
 - **Storage and compute are separate.** The data is a native DuckDB database in object storage, written through [`duckdb_object_storage`](/posts/duckdb-on-object-storage/). Workers attach it read-only, so nothing gets copied, sharded or rebalanced.
 - **One writer, many readers.** Writes go to the driver's single read-write attachment, and DuckDB's own storage engine writes them to the bucket. Reads from read-only attachments are split across workers.
 - **The driver ships DuckDB plans, not SQL.** An optimizer extension cuts fragments out of DuckDB's logical plan, splits them by row group, and merges partial results exactly. Small queries never fan out.
