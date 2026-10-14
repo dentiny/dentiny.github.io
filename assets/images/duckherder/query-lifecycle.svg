@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="1000" height="600" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8C959F"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="600" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">The life of one read query</text>
+
+  <!-- Lifeline heads -->
+  <g font-size="15" font-weight="700" text-anchor="middle" fill="#1F2328">
+    <rect x="60" y="72" width="160" height="40" rx="8" fill="#F3F1EA" stroke="#D8D3C4"/><text x="140" y="97">Client</text>
+    <rect x="320" y="72" width="160" height="40" rx="8" fill="#FFF1C2" stroke="#E3B341"/><text x="400" y="97">Driver</text>
+    <rect x="580" y="72" width="160" height="40" rx="8" fill="#DDE8FF" stroke="#7FA6EE"/><text x="660" y="97">Workers</text>
+    <rect x="800" y="72" width="160" height="40" rx="8" fill="#E3F4E6" stroke="#7CC08A"/><text x="880" y="97">Bucket</text>
+  </g>
+  <g stroke="#D8D3C4" stroke-width="2" stroke-dasharray="5 5">
+    <line x1="140" y1="114" x2="140" y2="570"/>
+    <line x1="400" y1="114" x2="400" y2="570"/>
+    <line x1="660" y1="114" x2="660" y2="570"/>
+    <line x1="880" y1="114" x2="880" y2="570"/>
+  </g>
+
+  <g font-size="13" fill="#1F2328">
+    <circle cx="40" cy="150" r="13" fill="#1F2328"/><text x="40" y="155" text-anchor="middle" fill="#FFFFFF" font-weight="700">1</text>
+    <path d="M 142 150 L 394 150" stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="268" y="140" text-anchor="middle">SQL</text>
+
+    <circle cx="40" cy="200" r="13" fill="#1F2328"/><text x="40" y="205" text-anchor="middle" fill="#FFFFFF" font-weight="700">2</text>
+    <rect x="410" y="180" width="230" height="40" rx="6" fill="#FFF1C2" stroke="#E3B341"/>
+    <text x="525" y="205" text-anchor="middle">plan, cut, split</text>
+
+    <circle cx="40" cy="262" r="13" fill="#1F2328"/><text x="40" y="267" text-anchor="middle" fill="#FFFFFF" font-weight="700">3</text>
+    <path d="M 402 262 L 654 262" stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="528" y="252" text-anchor="middle">plan + range</text>
+
+    <circle cx="40" cy="335" r="13" fill="#1F2328"/><text x="40" y="340" text-anchor="middle" fill="#FFFFFF" font-weight="700">4</text>
+    <path d="M 662 320 L 874 320" stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="768" y="310" text-anchor="middle">read</text>
+    <path d="M 874 350 L 662 350" stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="768" y="370" text-anchor="middle">own blocks</text>
+
+    <circle cx="40" cy="410" r="13" fill="#1F2328"/><text x="40" y="415" text-anchor="middle" fill="#FFFFFF" font-weight="700">5</text>
+    <rect x="590" y="392" width="140" height="40" rx="6" fill="#DDE8FF" stroke="#7FA6EE"/>
+    <text x="660" y="417" text-anchor="middle">execute</text>
+
+    <circle cx="40" cy="462" r="13" fill="#1F2328"/><text x="40" y="467" text-anchor="middle" fill="#FFFFFF" font-weight="700">6</text>
+    <path d="M 654 462 L 402 462" stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="528" y="452" text-anchor="middle">partials</text>
+
+    <circle cx="40" cy="512" r="13" fill="#1F2328"/><text x="40" y="517" text-anchor="middle" fill="#FFFFFF" font-weight="700">7</text>
+    <rect x="410" y="492" width="230" height="40" rx="6" fill="#FFF1C2" stroke="#E3B341"/>
+    <text x="525" y="517" text-anchor="middle">merge</text>
+    <path d="M 398 556 L 146 556" stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="270" y="546" text-anchor="middle">result</text>
+  </g>
+</svg>

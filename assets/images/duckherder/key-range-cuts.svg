@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 380" width="1000" height="380" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <rect width="1000" height="380" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">Key ranges from row group minimums</text>
+
+  <!-- Step 1 -->
+  <circle cx="52" cy="84" r="12" fill="#1F2328"/><text x="52" y="89" font-size="13" font-weight="700" text-anchor="middle" fill="#FFFFFF">1</text>
+  <text x="74" y="89" font-size="14" font-weight="700" fill="#1F2328">Read each row group's minimum key</text>
+  <g font-size="11" text-anchor="middle" fill="#1F2328">
+    <rect x="70"  y="104" width="70" height="40" rx="5" fill="#DDE8FF" stroke="#7FA6EE"/><text x="105" y="121">RG 0</text><text x="105" y="136" fill="#57606A">min 1</text>
+    <rect x="144" y="104" width="70" height="40" rx="5" fill="#DDE8FF" stroke="#7FA6EE"/><text x="179" y="121">RG 1</text><text x="179" y="136" fill="#57606A">min 5M</text>
+    <rect x="218" y="104" width="70" height="40" rx="5" fill="#DDE8FF" stroke="#7FA6EE"/><text x="253" y="121">RG 2</text><text x="253" y="136" fill="#57606A">min 10M</text>
+    <rect x="292" y="104" width="70" height="40" rx="5" fill="#DDE8FF" stroke="#7FA6EE"/><text x="327" y="121">RG 3</text><text x="327" y="136" fill="#57606A">min 15M</text>
+    <rect x="366" y="104" width="70" height="40" rx="5" fill="#FFE1D6" stroke="#E8957A"/><text x="401" y="121">RG 4</text><text x="401" y="136" fill="#57606A">min 20M</text>
+    <rect x="440" y="104" width="70" height="40" rx="5" fill="#FFE1D6" stroke="#E8957A"/><text x="475" y="121">RG 5</text><text x="475" y="136" fill="#57606A">min 25M</text>
+    <rect x="514" y="104" width="70" height="40" rx="5" fill="#FFE1D6" stroke="#E8957A"/><text x="549" y="121">RG 6</text><text x="549" y="136" fill="#57606A">min 30M</text>
+    <rect x="588" y="104" width="70" height="40" rx="5" fill="#FFE1D6" stroke="#E8957A"/><text x="623" y="121">RG 7</text><text x="623" y="136" fill="#57606A">min 35M</text>
+    <rect x="662" y="104" width="70" height="40" rx="5" fill="#E8DDFF" stroke="#A88BE6"/><text x="697" y="121">RG 8</text><text x="697" y="136" fill="#57606A">min 40M</text>
+    <rect x="736" y="104" width="70" height="40" rx="5" fill="#E8DDFF" stroke="#A88BE6"/><text x="771" y="121">RG 9</text><text x="771" y="136" fill="#57606A">min 45M</text>
+    <rect x="810" y="104" width="70" height="40" rx="5" fill="#E8DDFF" stroke="#A88BE6"/><text x="845" y="121">RG 10</text><text x="845" y="136" fill="#57606A">min 50M</text>
+    <rect x="884" y="104" width="76" height="40" rx="5" fill="#E8DDFF" stroke="#A88BE6"/><text x="922" y="121">RG 11</text><text x="922" y="136" fill="#57606A">min 55M</text>
+  </g>
+
+  <!-- Step 2 -->
+  <circle cx="52" cy="184" r="12" fill="#1F2328"/><text x="52" y="189" font-size="13" font-weight="700" text-anchor="middle" fill="#FFFFFF">2</text>
+  <text x="74" y="189" font-size="14" font-weight="700" fill="#1F2328">Cut into equal ranges</text>
+  <g stroke="#B4553F" stroke-width="3">
+    <line x1="363" y1="98" x2="363" y2="150"/>
+    <line x1="659" y1="98" x2="659" y2="150"/>
+  </g>
+  <g font-size="13" font-family="Menlo, monospace" fill="#1F2328">
+    <rect x="70" y="204" width="290" height="34" rx="6" fill="#DDE8FF" stroke="#7FA6EE"/><text x="82" y="226">key &lt; 20M or NULL</text>
+    <rect x="366" y="204" width="290" height="34" rx="6" fill="#FFE1D6" stroke="#E8957A"/><text x="378" y="226">20M &lt;= key &lt; 40M</text>
+    <rect x="662" y="204" width="298" height="34" rx="6" fill="#E8DDFF" stroke="#A88BE6"/><text x="674" y="226">key &gt;= 40M</text>
+  </g>
+
+  <!-- Step 3 -->
+  <circle cx="52" cy="278" r="12" fill="#1F2328"/><text x="52" y="283" font-size="13" font-weight="700" text-anchor="middle" fill="#FFFFFF">3</text>
+  <text x="74" y="283" font-size="14" font-weight="700" fill="#1F2328">Apply the same ranges to orders</text>
+  <g font-size="11" text-anchor="middle" fill="#1F2328">
+    <rect x="70"  y="298" width="140" height="40" rx="5" fill="#DDE8FF" stroke="#7FA6EE"/><text x="140" y="315">orders RG 0</text><text x="140" y="330" fill="#57606A">1 - 10M</text>
+    <rect x="216" y="298" width="140" height="40" rx="5" fill="#DDE8FF" stroke="#7FA6EE"/><text x="286" y="315">orders RG 1</text><text x="286" y="330" fill="#57606A">10M - 20M</text>
+    <rect x="366" y="298" width="140" height="40" rx="5" fill="#FFE1D6" stroke="#E8957A"/><text x="436" y="315">orders RG 2</text><text x="436" y="330" fill="#57606A">20M - 30M</text>
+    <rect x="512" y="298" width="144" height="40" rx="5" fill="#FFE1D6" stroke="#E8957A"/><text x="584" y="315">orders RG 3</text><text x="584" y="330" fill="#57606A">30M - 40M</text>
+    <rect x="662" y="298" width="146" height="40" rx="5" fill="#E8DDFF" stroke="#A88BE6"/><text x="735" y="315">orders RG 4</text><text x="735" y="330" fill="#57606A">40M - 50M</text>
+    <rect x="814" y="298" width="146" height="40" rx="5" fill="#E8DDFF" stroke="#A88BE6"/><text x="887" y="315">orders RG 5</text><text x="887" y="330" fill="#57606A">50M - 60M</text>
+  </g>
+</svg>

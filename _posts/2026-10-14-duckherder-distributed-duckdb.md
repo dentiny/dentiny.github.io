@@ -60,6 +60,10 @@ SELECT o_orderstatus, sum(o_totalprice), avg(o_totalprice) FROM dh.orders GROUP 
 
 The client forwards its S3 secret to the driver, and the driver passes it on to the workers with each task.
 
+Here's one read query from start to finish. The rest of the post zooms into each step.
+
+![A sequence diagram with four lifelines: client, driver, workers and bucket. 1: the client sends the whole SELECT as SQL. 2: the driver binds and optimizes it, cuts a fragment and writes one plan per task. 3: it sends each worker a serialized plan with a rowid range, build ID and storage config. 4: each worker attaches the database read-only on its first task and reads only its task's blocks. 5: workers run the fragment. 6: they return partial results as Arrow batches. 7: the driver merges them, runs the operators above the fragment, and streams the final result to the client.](/assets/images/duckherder/query-lifecycle.svg)
+
 ## The write path: let DuckDB write
 
 The write path has almost no distributed logic, and that's on purpose.
@@ -82,13 +86,19 @@ The cost of this design is that writes don't scale out: one database has one wri
 
 Reads start on the client. If a query reads only remote tables from one database and the client hasn't changed any setting that affects results, the client sends the whole `SELECT` to the driver. Otherwise, say for a join between a remote table and a local one, it reads each remote table with its projections and filters pushed down, and joins locally. Either way, results come back as Arrow batches that client threads convert in parallel.
 
+![Left: whole-query pushdown, where the client sends the rewritten SQL of a query that reads only remote tables of one database, keeps default settings, calls no client macros or session functions, has no prepared parameters and depends on no time zone. Right: per-table remote scans for everything else, where each remote table is fetched with only the needed columns and pushed-down filters, and the client joins locally.](/assets/images/duckherder/client-pushdown.svg)
+
 The interesting part happens on the driver. An optimizer extension, running after DuckDB's own optimizers, walks down the plan and looks for the first aggregate, Join or table scan it can turn into a **worker fragment**. If it finds one, that subtree is replaced with a table function that runs the fragment on workers, and the operators above it stay on the driver.
+
+![Left: the optimized plan ORDER BY, PROJECTION, AGGREGATE, HASH JOIN over lineitem and orders, with the aggregate and everything below it outlined. Middle: what stays on the driver: ORDER BY, PROJECTION, a projection that finishes avg, a merge aggregate, and the worker_fragment table function. Right: what every worker gets: a projection pinning the column order, a partial aggregate computing sums and a count, the hash join, a scan of lineitem restricted to rowid range i, and a full scan of orders.](/assets/images/duckherder/fragment-cut.svg)
 
 ![Left: a small query is shipped to the driver, which runs it itself or as a single task. Right: a large table's row groups are assigned to three workers, each computes partial sums and counts over its own row groups, and the driver merges them.](/assets/images/duckherder/read-path.svg)
 
 ### Small data never fans out
 
 Distributing a query has a fixed cost: serializing plans, a network round trip per task, converting results. For small data that cost is the whole query, so the driver keeps it local whenever splitting can't help:
+
+![A flowchart of the questions the driver asks: is it a read-only client in autocommit with workers and a database in a bucket; is there an aggregate, Join or scan before any LIMIT; can workers read every table under it; does splitting keep the result the same; does it split into two or more tasks; and for a Join, is one task faster than one node with hash tables that fit in memory. Any no keeps the work on the driver, except that a single-table fragment over one row group runs as one task. All yes fans out one task per worker.](/assets/images/duckherder/fanout-decision.svg)
 
 - **A table with one row group** (up to 122,880 rows) can't be split. A single-table fragment over it is sent as a single task, and a Join in which no input splits into at least two tasks runs on the driver.
 - **A query with a `LIMIT`** may need only a few rows, which the driver reads faster than workers can return a whole table.
@@ -101,12 +111,16 @@ DuckDB stores a table as row groups of 122,880 rows, each with its own column se
 
 So for a large table, the driver assigns contiguous runs of row groups to tasks, one task per worker, and expresses each run as a filter on DuckDB's `rowid`. The first task's range starts at zero and the last one has no upper bound, so rows appended after planning are still covered exactly once. On the worker, a small optimizer extension replaces the table scan with a range scan that skips straight to the task's first row group and stops after its last. The worker only fetches its own blocks from the bucket.
 
+![A table with 12 row groups split into three tasks by rowid: task 1 reads rowids below 491,520, task 2 reads from 491,520 to below 983,040, and task 3 reads from 983,040 with no upper bound. On worker 2 the table scan becomes a row group range scan over row groups 4 to 7; row groups 0 to 3 and 8 to 11 are never opened, so the bucket only serves the blocks of row groups 4 to 7, and only the columns the plan reads.](/assets/images/duckherder/row-group-scan.svg)
+
 Results are merged exactly:
 
 - `sum`, `min` and `max` are merged by the same function, and `count` by summing the counts.
 - `avg` is split into a sum and a count on the workers, and the driver divides them the way DuckDB's `avg` does. That's exact for integers and decimals. For floating point, the sum depends on row order, so it stays local.
 - `count(DISTINCT x)` and friends make each task return its distinct values of `x`, and the driver aggregates their union.
 - Anything else, like `string_agg`, `FILTER` clauses or ordered aggregates, keeps the aggregate on the driver.
+
+![A table with three columns: the aggregate in the query, what each worker returns, and what the driver computes. sum, min and max are merged by the same function; counts are summed and cast to BIGINT; avg over integers or decimals becomes a sum and a count, divided on the driver the way DuckDB divides; count DISTINCT becomes the distinct values of x, counted again over their union. avg over DOUBLE, string_agg, lists, quantiles, FILTER and ORDER BY clauses, top-N min and max, and grouping sets stay on the driver.](/assets/images/duckherder/aggregate-merge.svg)
 
 ### Plans, not SQL
 
@@ -117,6 +131,8 @@ So the driver now sends DuckDB's own serialized logical plans. A worker deserial
 - **Plans carry a build ID.** The serialization format isn't stable across DuckDB builds, so a worker rejects plans from a different build instead of misreading them.
 - **Output columns are pinned.** The worker's optimizer may reorder a Join's inputs or merge duplicate aggregates, so every fragment is wrapped in a projection that fixes its column order.
 - **No planning-time statistics in the plan.** DuckDB's compressed materialization bakes the driver's statistics into the plan, and workers may see newer data, so it's disabled on the driver.
+
+![The removed first version rendered the bound plan back to SQL with rowid BETWEEN, and the worker parsed, bound and planned it again. Now the driver copies the fragment from the optimized plan, wraps it in a projection that pins the columns, makes one copy per task with that task's range, and serializes it with DuckDB's plan serializer and a build ID. The worker checks the build ID, deserializes, optimizes again, executes, and streams Arrow batches back.](/assets/images/duckherder/plan-shipping.svg)
 
 ## Joins without a shuffle
 
@@ -132,9 +148,13 @@ The driver splits the input that reads the most bytes by row group, as above, an
 
 Not every Join type allows it. For an inner Join, either side can be split. For left, semi and anti Joins, each left row needs to see every right row it could match, so only the left side may be split, and right Joins mirror that. A full outer Join can't be split this way at all.
 
+![A matrix of Join types against three ways to split. Inner Joins allow all three. Left, semi, anti and single Joins allow splitting the left side or both sides by key. Right Joins allow splitting the right side or both by key. Full outer Joins only allow splitting both by key. Mark Joins only allow splitting the left side.](/assets/images/duckherder/join-rules.svg)
+
 ### Co-partition by key ranges
 
 The second option uses something tables often already have: an order. Data is usually loaded in roughly key order, by ID or by date, and DuckDB keeps min/max statistics for every row group. When the row groups of both inputs are ordered on the Join key, the driver reads those minimums, cuts the key space into ranges with about the same number of row groups each, and gives each task one range of every table. Rows with equal keys always meet in the same task.
+
+![Step 1: read the minimum orderkey of each of lineitem's 12 row groups, from 1 to 55 million, and check each is above the previous maximum. Step 2: cut at the minimums 20 million and 40 million, so three tasks get four row groups each; the first range also takes NULL keys. Step 3: apply the same ranges to orders, whose six row groups are ordered on the key too. Each worker's zone maps then skip every row group outside its range in both tables.](/assets/images/duckherder/key-range-cuts.svg)
 
 In TPC-H, `lineitem` and `orders` are both ordered on `orderkey`. Co-partitioning them means nothing is read twice, and since equal keys never cross tasks, left, right, semi, anti and even full outer Joins split correctly. The same reasoning extends upward. A `GROUP BY` on the key keeps whole groups within one task, and correlated subqueries, which DuckDB plans as a `DELIM_JOIN`, split when the outer query is split on the correlated column.
 
@@ -148,6 +168,8 @@ Replicating isn't free: every task reads the small tables again, and all tasks h
 - **In one task**, the query scans its share of the big table, plus every replicated input in full, and builds on the smaller of each replicated input and its share of the big one.
 
 Because tasks share the bucket but not CPUs, each replicated read is charged a contention factor of \((n + 1) / 2\) for \(n\) tasks. The driver splits only when one task finishes first and every task's hash tables fit in memory. Estimates come from DuckDB's own cardinality estimates and the same row widths its build-side optimizer uses.
+
+![Two illustrative Joins on three workers. A: a 30 GB fact table joined with a 1 GB dimension reads 31 GB on one node, but only 12 GB per task (a 10 GB share plus the dimension charged twice), so it splits. B: 30 GB joined with 20 GB that isn't ordered on the key reads 50 GB on one node and also 50 GB per task (a 10 GB share plus 20 GB charged twice), so it stays local.](/assets/images/duckherder/cost-model.svg)
 
 Joins without an aggregate above them are distributed too, but only when the operators above just project or sort. Otherwise every joined row would travel back to the driver, a cost the model doesn't count yet. For experiments, `SET duckherder_join_partitioning = 'always'` (or `'never'`) overrides the cost model.
 
@@ -172,6 +194,8 @@ A distributed benchmark is easy to fool yourself with, so the setup is mostly ab
 - **Results are checked before they're timed.** Every query's result is compared with plain DuckDB over a local copy of the same data. A fast wrong answer fails the run.
 - **Runs record their context.** Each run writes the commit, settings, CPU and memory limits, and startup SQL next to the timings, plus per-query logs and the driver's execution stats showing what was split.
 
+![The CPU map: client on CPUs 0-1, workers on 2-3, 4-5 and 6-7, driver on 8-9, each with 4 GiB, and RustFS on efficiency cores 16-19 with 2 GiB in Docker. In the driver and every worker, a latency injection wrapper sits between DuckDB's storage engine and the SlateDB filesystem. One run loads TPC-H once, starts the cluster for each worker count, checks all 22 results against plain DuckDB, restarts every process before each timed run, and writes medians, timings, logs, stats and the commit and settings used.](/assets/images/duckherder/benchmark-setup.svg)
+
 Here's SF10 on an i7-12700K. Each DuckDB process gets two threads of one performance core and 4 GiB, and RustFS gets the four efficiency cores:
 
 ![TPC-H SF10, cold start, with and without simulated S3 latency, 0 workers versus 3 workers. Q1 and Q6 drop from about 29 and 30 seconds to about 20 and 21 seconds with simulated latency; other queries are unchanged.](/assets/images/duckherder/tpch-sf10-cold.png)
@@ -188,11 +212,27 @@ Fragments only split native DuckDB tables today, because the row group is the un
 
 ### A real shuffle
 
-Replicate-and-split and key ranges cover a lot, but not everything: Joins between two large tables that aren't ordered on the key, `GROUP BY`s with millions of groups, and Joins whose output is too large to return to the driver. Those need workers to exchange data by hash partition, and multi-stage plans where one stage's output feeds the next. Arrow Flight already gives us the transport. The hard parts are memory, back pressure and failures in the middle of a stage.
+Replicate-and-split and key ranges cover a lot, but not everything: Joins between two large tables that aren't ordered on the key, `GROUP BY`s with millions of groups, and Joins whose output is too large to return to the driver. Those need workers to exchange data by hash partition, and multi-stage plans where one stage's output feeds the next. The transport is the easy part. The hard parts are memory, back pressure and failures in the middle of a stage.
+
+![Left: distributed read_parquet, where the driver globs the files, reads their footers and assigns Parquet row groups to three workers, each with cache_httpfs. Right: a two-stage shuffle, where three workers scan and hash rows by the Join key and send each row to the worker that owns its hash range, which then runs the Join or GROUP BY.](/assets/images/duckherder/roadmap-shuffle.svg)
 
 ### One snapshot per query
 
 Read-only workers follow the writer's SlateDB manifest, by default about every 10 seconds. A worker can therefore lag a recent commit, and two workers in the same query can see different versions. The fix is to pin every query to one committed snapshot, chosen by the driver and sent with each task. With a strong-consistency mode in `duckdb_object_storage`, that becomes "the latest commit, on every worker."
+
+![A timeline with commit 41, commit 42 and then the query start. Today, two workers that polled after commit 42 read it, while a worker that last polled before it reads commit 41. Pinned, the driver picks commit 42 for the query and sends it with every task, so all three workers read commit 42.](/assets/images/duckherder/snapshot-pinning.svg)
+
+### Building on Quack
+
+In May, DuckDB Labs released [Quack](https://duckdb.org/2026/05/12/quack-remote-protocol), DuckDB's own client-server protocol: one DuckDB instance attaches another over HTTP. It's in beta in DuckDB v1.5.3, with a stable release planned for v2.0. Quack didn't exist when I started Duckherder, so we built on Arrow Flight. I'd like to move both links, client to driver and driver to workers, onto Quack:
+
+![Today: Arrow Flight and protobuf carry SQL text or scans with filters rendered back to SQL, results go through Arrow and lose some types, gRPC, Arrow, Flight and protobuf are in every build, there's no TLS or authentication, and whole-query pushdown refuses many queries. With Quack: a remote pushdown operator carries a serialized plan subtree, results keep every type in DuckDB's own serialization, a query takes one round trip over HTTP(S), TLS and authentication come with it, and the dependencies go away. Below, a query joining a local table with remote tables sends the remote aggregate, filter and Join to the driver as one remote pushdown operator and gets back only the aggregated rows.](/assets/images/duckherder/quack.svg)
+
+- **A remote pushdown operator.** Today the client gives the driver either SQL text or a table scan whose filters it renders back to SQL, and only comparisons, `AND`/`OR` and `IS NULL` survive that. Whole-query pushdown refuses anything the server might resolve differently: session functions, time zones, client macros, and queries mixing local and remote tables. A remote pushdown operator would carry a serialized plan subtree instead (filters, aggregates and Joins over remote tables) in DuckDB's own format, the way the driver already ships fragments to workers. A query joining a local table with two remote ones would push the remote Join and aggregate to the driver and get back only the aggregated rows. Quack doesn't carry plans today, but it's built on DuckDB's own serialization, and DuckDB Labs is considering letting extensions add their own protocol messages. That's exactly the hook this needs.
+- **No Arrow round trip.** Every hop today converts DuckDB vectors to Arrow and back, and `UNION`, `BIT` and `BIGNUM` values don't survive. Quack sends results in DuckDB's own serialization, fetched by several threads in parallel. In DuckDB Labs' benchmark, it moved bulk results faster than Arrow Flight SQL.
+- **One round trip per query**, which matters for the small queries that never fan out.
+- **Fewer dependencies.** Quack ships with DuckDB, so Duckherder could drop gRPC, Arrow, Flight and protobuf from its build: the "nothing extra" goal, applied to the build too.
+- **Security that comes with it.** Quack runs over HTTP(S) behind any reverse proxy and has pluggable authentication, which covers most of the production basics below.
 
 ### Cache-aware scheduling
 
@@ -207,7 +247,7 @@ Today, task \(i\) goes to whichever worker is \(i\)th in the list. If the same r
 
 ### Production basics
 
-TLS and authentication on Flight come first: today the S3 credentials travel to workers unencrypted, so it belongs on a trusted network only. After that come dynamic worker scaling and per-query resource tracking.
+TLS and authentication come first, on Flight or by moving to Quack: today the S3 credentials travel to workers unencrypted, so Duckherder belongs on a trusted network only. After that come dynamic worker scaling and per-query resource tracking.
 
 ## Try it
 

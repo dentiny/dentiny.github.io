@@ -1,94 +1,74 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" width="1000" height="620" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 540" width="1000" height="540" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#8C959F"/>
     </marker>
   </defs>
-  <rect width="1000" height="620" rx="16" fill="#FFFDF7"/>
-  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">Four pieces, all of them DuckDB extensions</text>
+  <rect width="1000" height="540" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">Four pieces, all DuckDB extensions</text>
 
   <!-- Clients -->
   <g font-size="16" text-anchor="middle">
-    <rect x="40" y="90" width="220" height="84" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
-    <text x="150" y="122" font-weight="700" fill="#1F2328">Writer client</text>
-    <text x="150" y="146" font-size="13" fill="#57606A">ATTACH ... (TYPE duckherder)</text>
-    <text x="150" y="164" font-size="13" fill="#57606A">at most one per database</text>
+    <rect x="40" y="90" width="220" height="70" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="150" y="120" font-weight="700" fill="#1F2328">Writer client</text>
+    <text x="150" y="142" font-size="13" fill="#57606A">at most one</text>
 
-    <rect x="40" y="200" width="220" height="84" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
-    <text x="150" y="232" font-weight="700" fill="#1F2328">Reader clients</text>
-    <text x="150" y="256" font-size="13" fill="#57606A">ATTACH ... (READ_ONLY)</text>
-    <text x="150" y="274" font-size="13" fill="#57606A">any number</text>
+    <rect x="40" y="200" width="220" height="70" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="150" y="230" font-weight="700" fill="#1F2328">Reader clients</text>
+    <text x="150" y="252" font-size="13" fill="#57606A">any number</text>
   </g>
 
   <!-- Driver -->
-  <rect x="340" y="80" width="300" height="230" rx="14" fill="#FFF1C2" stroke="#E3B341"/>
+  <rect x="340" y="80" width="300" height="210" rx="14" fill="#FFF1C2" stroke="#E3B341"/>
   <text x="490" y="110" font-size="17" font-weight="700" text-anchor="middle" fill="#1F2328">Driver</text>
-  <g font-size="14" fill="#1F2328">
-    <rect x="360" y="124" width="260" height="50" rx="8" fill="#FFFDF7" stroke="#E3B341"/>
-    <text x="490" y="146" text-anchor="middle" font-weight="600">The only read-write attachment</text>
-    <text x="490" y="164" text-anchor="middle" font-size="12" fill="#57606A">applies DDL and DML, commits to the bucket</text>
-    <rect x="360" y="184" width="260" height="50" rx="8" fill="#FFFDF7" stroke="#E3B341"/>
-    <text x="490" y="206" text-anchor="middle" font-weight="600">Optimizer extension</text>
-    <text x="490" y="224" text-anchor="middle" font-size="12" fill="#57606A">cuts plan fragments, plans tasks</text>
-    <rect x="360" y="244" width="260" height="50" rx="8" fill="#FFFDF7" stroke="#E3B341"/>
-    <text x="490" y="266" text-anchor="middle" font-weight="600">Merge</text>
-    <text x="490" y="284" text-anchor="middle" font-size="12" fill="#57606A">partial aggregates, concatenated rows</text>
+  <g font-size="14" font-weight="600" text-anchor="middle" fill="#1F2328">
+    <rect x="360" y="126" width="260" height="42" rx="8" fill="#FFFDF7" stroke="#E3B341"/><text x="490" y="152">Only writer</text>
+    <rect x="360" y="178" width="260" height="42" rx="8" fill="#FFFDF7" stroke="#E3B341"/><text x="490" y="204">Plans tasks</text>
+    <rect x="360" y="230" width="260" height="42" rx="8" fill="#FFFDF7" stroke="#E3B341"/><text x="490" y="256">Merges results</text>
   </g>
 
   <!-- Client to driver arrows -->
   <g stroke="#8C959F" stroke-width="2" fill="none" marker-end="url(#arrow)">
-    <path d="M 262 132 L 334 150"/>
-    <path d="M 262 242 L 334 212"/>
+    <path d="M 262 125 L 334 150"/>
+    <path d="M 262 235 L 334 212"/>
   </g>
-  <text x="298" y="186" font-size="12" fill="#6E7781" text-anchor="middle">Arrow</text>
-  <text x="298" y="200" font-size="12" fill="#6E7781" text-anchor="middle">Flight</text>
+  <text x="298" y="186" font-size="12" fill="#6E7781" text-anchor="middle">Flight</text>
 
   <!-- Workers -->
   <g font-size="15" text-anchor="middle">
-    <rect x="730" y="80" width="230" height="64" rx="10" fill="#DDE8FF" stroke="#7FA6EE"/>
-    <text x="845" y="107" font-weight="700" fill="#1F2328">Worker 1</text>
-    <text x="845" y="127" font-size="12" fill="#57606A">READ_ONLY attachment, no state</text>
-    <rect x="730" y="163" width="230" height="64" rx="10" fill="#DDE8FF" stroke="#7FA6EE"/>
+    <rect x="730" y="80" width="230" height="56" rx="10" fill="#DDE8FF" stroke="#7FA6EE"/>
+    <text x="845" y="113" font-weight="700" fill="#1F2328">Worker 1</text>
+    <rect x="730" y="157" width="230" height="56" rx="10" fill="#DDE8FF" stroke="#7FA6EE"/>
     <text x="845" y="190" font-weight="700" fill="#1F2328">Worker 2</text>
-    <text x="845" y="210" font-size="12" fill="#57606A">READ_ONLY attachment, no state</text>
-    <rect x="730" y="246" width="230" height="64" rx="10" fill="#DDE8FF" stroke="#7FA6EE"/>
-    <text x="845" y="273" font-weight="700" fill="#1F2328">Worker N</text>
-    <text x="845" y="293" font-size="12" fill="#57606A">READ_ONLY attachment, no state</text>
+    <rect x="730" y="234" width="230" height="56" rx="10" fill="#DDE8FF" stroke="#7FA6EE"/>
+    <text x="845" y="267" font-weight="700" fill="#1F2328">Worker N</text>
   </g>
+  <text x="845" y="312" font-size="12" fill="#6E7781" text-anchor="middle">stateless, read-only</text>
   <g stroke="#8C959F" stroke-width="2" fill="none" marker-end="url(#arrow)">
-    <path d="M 642 200 C 690 200, 680 112, 724 112"/>
-    <path d="M 642 200 L 724 195"/>
-    <path d="M 642 200 C 690 200, 680 278, 724 278"/>
+    <path d="M 642 185 C 690 185, 680 108, 724 108"/>
+    <path d="M 642 185 L 724 185"/>
+    <path d="M 642 185 C 690 185, 680 262, 724 262"/>
   </g>
-  <text x="686" y="342" font-size="12" fill="#6E7781" text-anchor="middle">serialized logical plans out,</text>
-  <text x="686" y="358" font-size="12" fill="#6E7781" text-anchor="middle">Arrow batches back</text>
 
   <!-- Bucket -->
-  <rect x="340" y="420" width="620" height="150" rx="14" fill="#E3F4E6" stroke="#7CC08A"/>
-  <text x="650" y="452" font-size="17" font-weight="700" text-anchor="middle" fill="#1F2328">One bucket: the only shared state</text>
-  <text x="650" y="476" font-size="13" text-anchor="middle" fill="#57606A">a native DuckDB database stored through duckdb_object_storage (SlateDB on S3)</text>
-  <g font-size="13" text-anchor="middle">
-    <rect x="370" y="496" width="270" height="54" rx="8" fill="#FFFDF7" stroke="#7CC08A"/>
-    <text x="505" y="518" font-weight="600" fill="#1F2328">Storage-layer cache</text>
-    <text x="505" y="537" font-size="12" fill="#57606A">SlateDB block cache; cache_httpfs for S3 files</text>
-    <rect x="660" y="496" width="270" height="54" rx="8" fill="#FFFDF7" stroke="#7CC08A"/>
-    <text x="795" y="518" font-weight="600" fill="#1F2328">Query-layer cache</text>
-    <text x="795" y="537" font-size="12" fill="#57606A">query_condition_cache skips row groups</text>
+  <rect x="340" y="400" width="620" height="110" rx="14" fill="#E3F4E6" stroke="#7CC08A"/>
+  <text x="650" y="428" font-size="17" font-weight="700" text-anchor="middle" fill="#1F2328">Bucket: the only shared state</text>
+  <g font-size="13" font-weight="600" text-anchor="middle" fill="#1F2328">
+    <rect x="370" y="446" width="270" height="44" rx="8" fill="#FFFDF7" stroke="#7CC08A"/><text x="505" y="473">Storage cache</text>
+    <rect x="660" y="446" width="270" height="44" rx="8" fill="#FFFDF7" stroke="#7CC08A"/><text x="795" y="473">Query cache</text>
   </g>
 
   <!-- Storage arrows -->
   <g stroke="#8C959F" stroke-width="2" fill="none" marker-end="url(#arrow)">
-    <path d="M 490 312 L 490 414"/>
-    <path d="M 845 312 L 845 414"/>
+    <path d="M 490 292 L 490 394"/>
+    <path d="M 845 322 L 845 394"/>
   </g>
-  <text x="500" y="370" font-size="12" fill="#6E7781">writes and commits</text>
-  <text x="855" y="370" font-size="12" fill="#6E7781">reads committed state</text>
+  <text x="500" y="350" font-size="12" fill="#6E7781">writes</text>
+  <text x="855" y="364" font-size="12" fill="#6E7781">reads</text>
 
-  <text x="40" y="420" font-size="14" font-weight="600" fill="#8C7A4B">NOTHING ELSE TO RUN</text>
+  <text x="40" y="420" font-size="14" font-weight="600" fill="#8C7A4B">NOTHING ELSE</text>
   <g font-size="13" fill="#57606A">
     <text x="40" y="446">No catalog service</text>
-    <text x="40" y="468">No metastore database</text>
-    <text x="40" y="490">No JVM, no Ray, no Spark</text>
-    <text x="40" y="512">No data copied to workers</text>
+    <text x="40" y="468">No JVM or Spark</text>
   </g>
 </svg>

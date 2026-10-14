@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 390" width="1000" height="390" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <rect width="1000" height="390" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">Which side of a Join may be split</text>
+
+  <g font-size="14" font-weight="700" fill="#1F2328" text-anchor="middle">
+    <rect x="40" y="70" width="280" height="56" rx="6" fill="#F3F1EA" stroke="#D8D3C4"/><text x="180" y="103">Join type</text>
+    <rect x="330" y="70" width="200" height="56" rx="6" fill="#F3F1EA" stroke="#D8D3C4"/><text x="430" y="103">Split left</text>
+    <rect x="540" y="70" width="200" height="56" rx="6" fill="#F3F1EA" stroke="#D8D3C4"/><text x="640" y="103">Split right</text>
+    <rect x="750" y="70" width="210" height="56" rx="6" fill="#F3F1EA" stroke="#D8D3C4"/><text x="855" y="103">Co-split by key</text>
+  </g>
+
+  <g font-size="14" fill="#1F2328">
+    <text x="56" y="160">INNER</text>
+    <text x="56" y="210">LEFT, SEMI, ANTI</text>
+    <text x="56" y="260">RIGHT</text>
+    <text x="56" y="310">FULL OUTER</text>
+    <text x="56" y="360">MARK</text>
+  </g>
+  <g stroke="#E6E1D3">
+    <line x1="40" y1="180" x2="960" y2="180"/><line x1="40" y1="230" x2="960" y2="230"/>
+    <line x1="40" y1="280" x2="960" y2="280"/><line x1="40" y1="330" x2="960" y2="330"/>
+  </g>
+
+  <g font-size="22" font-weight="700" text-anchor="middle">
+    <text x="430" y="163" fill="#2E7D32">&#10003;</text><text x="640" y="163" fill="#2E7D32">&#10003;</text><text x="855" y="163" fill="#2E7D32">&#10003;</text>
+    <text x="430" y="213" fill="#2E7D32">&#10003;</text><text x="640" y="213" fill="#B4553F">&#10007;</text><text x="855" y="213" fill="#2E7D32">&#10003;</text>
+    <text x="430" y="263" fill="#B4553F">&#10007;</text><text x="640" y="263" fill="#2E7D32">&#10003;</text><text x="855" y="263" fill="#2E7D32">&#10003;</text>
+    <text x="430" y="313" fill="#B4553F">&#10007;</text><text x="640" y="313" fill="#B4553F">&#10007;</text><text x="855" y="313" fill="#2E7D32">&#10003;</text>
+    <text x="430" y="363" fill="#2E7D32">&#10003;</text><text x="640" y="363" fill="#B4553F">&#10007;</text><text x="855" y="363" fill="#B4553F">&#10007;</text>
+  </g>
+</svg>

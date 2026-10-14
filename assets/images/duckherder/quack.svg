@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 440" width="1000" height="440" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8C959F"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="440" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">Next: build on Quack</text>
+
+  <!-- Today -->
+  <rect x="40" y="70" width="440" height="190" rx="14" fill="none" stroke="#B9B2A0" stroke-dasharray="7 6"/>
+  <text x="60" y="96" font-size="14" font-weight="600" fill="#8C7A4B">TODAY: ARROW FLIGHT</text>
+  <g font-size="13" text-anchor="middle">
+    <rect x="70" y="112" width="160" height="46" rx="8" fill="#F3F1EA" stroke="#D8D3C4"/><text x="150" y="140" font-weight="700" fill="#1F2328">Client</text>
+    <rect x="290" y="112" width="160" height="46" rx="8" fill="#FFF1C2" stroke="#E3B341"/><text x="370" y="140" font-weight="700" fill="#1F2328">Driver</text>
+  </g>
+  <path d="M 232 135 L 284 135" stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)"/>
+  <g font-size="13" fill="#57606A">
+    <text x="70" y="190">&#8594; SQL text</text>
+    <text x="70" y="214">&#8592; Arrow, some types lost</text>
+    <text x="70" y="238">&#8226; gRPC + Arrow + protobuf</text>
+  </g>
+
+  <!-- Quack -->
+  <rect x="520" y="70" width="440" height="190" rx="14" fill="#F2FAF3" stroke="#7CC08A"/>
+  <text x="540" y="96" font-size="14" font-weight="600" fill="#2E7D32">WITH QUACK</text>
+  <g font-size="13" text-anchor="middle">
+    <rect x="550" y="112" width="160" height="46" rx="8" fill="#F3F1EA" stroke="#D8D3C4"/><text x="630" y="140" font-weight="700" fill="#1F2328">Client</text>
+    <rect x="770" y="112" width="160" height="46" rx="8" fill="#FFF1C2" stroke="#E3B341"/><text x="850" y="140" font-weight="700" fill="#1F2328">Driver</text>
+  </g>
+  <path d="M 712 135 L 764 135" stroke="#7CC08A" stroke-width="2" marker-end="url(#arrow)"/>
+  <g font-size="13" fill="#57606A">
+    <text x="550" y="190">&#8594; serialized plan subtree</text>
+    <text x="550" y="214">&#8592; DuckDB format, every type</text>
+    <text x="550" y="238">&#8226; ships with DuckDB, HTTPS</text>
+  </g>
+
+  <!-- Remote pushdown operator -->
+  <text x="40" y="300" font-size="14" font-weight="600" fill="#8C7A4B">REMOTE PUSHDOWN OPERATOR</text>
+  <g font-size="12" text-anchor="middle">
+    <rect x="40" y="316" width="150" height="40" rx="7" fill="#F3F1EA" stroke="#D8D3C4"/><text x="115" y="341" fill="#1F2328">HASH JOIN</text>
+    <rect x="230" y="316" width="170" height="40" rx="7" fill="#F3F1EA" stroke="#D8D3C4"/><text x="315" y="341" fill="#1F2328">SCAN local_t</text>
+    <rect x="230" y="372" width="170" height="40" rx="7" fill="#E3F4E6" stroke="#7CC08A" stroke-width="2"/><text x="315" y="397" font-weight="700" fill="#1F2328">REMOTE PUSHDOWN</text>
+  </g>
+  <g stroke="#8C959F" stroke-width="2">
+    <line x1="192" y1="336" x2="228" y2="336"/>
+    <path d="M 115 358 L 115 392 L 228 392" fill="none"/>
+  </g>
+  <path d="M 402 392 L 470 392" stroke="#7CC08A" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="476" y="306" width="484" height="110" rx="10" fill="#FFF1C2" stroke="#E3B341"/>
+  <text x="492" y="330" font-size="13" font-weight="700" fill="#1F2328">On the driver and workers</text>
+  <g font-size="12" font-family="Menlo, monospace" fill="#1F2328">
+    <text x="492" y="356">AGGREGATE</text>
+    <text x="508" y="378">FILTER</text>
+    <text x="524" y="400">HASH JOIN remote_a, remote_b</text>
+  </g>
+</svg>

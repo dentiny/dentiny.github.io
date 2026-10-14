@@ -1,64 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 440" width="1000" height="440" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 340" width="1000" height="340" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#8C959F"/>
     </marker>
   </defs>
-  <rect width="1000" height="440" rx="16" fill="#FFFDF7"/>
-  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">The write path: DuckDB writes, the filesystem underneath is a bucket</text>
+  <rect width="1000" height="340" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">The write path</text>
 
   <g font-size="15" text-anchor="middle">
-    <!-- Client -->
-    <rect x="40" y="90" width="200" height="120" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
-    <text x="140" y="118" font-weight="700" fill="#1F2328">Client</text>
-    <text x="140" y="142" font-size="12" fill="#57606A">Duckherder catalog plans</text>
-    <text x="140" y="160" font-size="12" fill="#57606A">INSERT / UPDATE / DELETE /</text>
-    <text x="140" y="178" font-size="12" fill="#57606A">MERGE / DDL as one remote</text>
-    <text x="140" y="196" font-size="12" fill="#57606A">statement</text>
+    <rect x="40" y="90" width="200" height="80" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="140" y="124" font-weight="700" fill="#1F2328">Client</text>
+    <text x="140" y="146" font-size="12" fill="#57606A">sends the statement</text>
 
-    <!-- Driver -->
-    <rect x="300" y="90" width="200" height="120" rx="10" fill="#FFF1C2" stroke="#E3B341"/>
-    <text x="400" y="118" font-weight="700" fill="#1F2328">Driver</text>
-    <text x="400" y="142" font-size="12" fill="#57606A">runs it on the read-write</text>
-    <text x="400" y="160" font-size="12" fill="#57606A">attachment, with DuckDB's</text>
-    <text x="400" y="178" font-size="12" fill="#57606A">own constraints, indexes</text>
-    <text x="400" y="196" font-size="12" fill="#57606A">and transactions</text>
+    <rect x="300" y="90" width="200" height="80" rx="10" fill="#FFF1C2" stroke="#E3B341"/>
+    <text x="400" y="124" font-weight="700" fill="#1F2328">Driver</text>
+    <text x="400" y="146" font-size="12" fill="#57606A">plain DuckDB</text>
 
-    <!-- objfs -->
-    <rect x="560" y="90" width="180" height="120" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
-    <text x="650" y="118" font-weight="700" fill="#1F2328">duckdb_objfs://</text>
-    <text x="650" y="142" font-size="12" fill="#57606A">WAL appends and</text>
-    <text x="650" y="160" font-size="12" fill="#57606A">256 KiB blocks become</text>
-    <text x="650" y="178" font-size="12" fill="#57606A">SlateDB keys</text>
+    <rect x="560" y="90" width="180" height="80" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/>
+    <text x="650" y="124" font-weight="700" fill="#1F2328">duckdb_objfs://</text>
+    <text x="650" y="146" font-size="12" fill="#57606A">SlateDB</text>
 
-    <!-- Bucket -->
-    <rect x="800" y="90" width="160" height="120" rx="10" fill="#E3F4E6" stroke="#7CC08A"/>
-    <text x="880" y="118" font-weight="700" fill="#1F2328">Bucket</text>
-    <text x="880" y="142" font-size="12" fill="#57606A">SlateDB WAL,</text>
-    <text x="880" y="160" font-size="12" fill="#57606A">SSTs, manifest</text>
-    <text x="880" y="178" font-size="12" fill="#57606A">(writer epoch)</text>
+    <rect x="800" y="90" width="160" height="80" rx="10" fill="#E3F4E6" stroke="#7CC08A"/>
+    <text x="880" y="136" font-weight="700" fill="#1F2328">Bucket</text>
   </g>
   <g stroke="#8C959F" stroke-width="2" fill="none" marker-end="url(#arrow)">
-    <line x1="242" y1="150" x2="294" y2="150"/>
-    <line x1="502" y1="150" x2="554" y2="150"/>
-    <line x1="742" y1="150" x2="794" y2="150"/>
+    <line x1="242" y1="130" x2="294" y2="130"/>
+    <line x1="502" y1="130" x2="554" y2="130"/>
+    <line x1="742" y1="130" x2="794" y2="130"/>
   </g>
-  <text x="268" y="140" font-size="12" fill="#6E7781" text-anchor="middle">Flight</text>
+  <text x="268" y="120" font-size="12" fill="#6E7781" text-anchor="middle">Flight</text>
 
   <!-- Workers -->
-  <rect x="560" y="290" width="400" height="100" rx="10" fill="#DDE8FF" stroke="#7FA6EE"/>
-  <text x="760" y="320" font-size="15" font-weight="700" text-anchor="middle" fill="#1F2328">Workers (read-only)</text>
-  <text x="760" y="344" font-size="12" text-anchor="middle" fill="#57606A">attach the same database on their first task and follow</text>
-  <text x="760" y="362" font-size="12" text-anchor="middle" fill="#57606A">the writer's manifest; they never see a half-written state</text>
-  <path d="M 880 212 L 880 284" stroke="#8C959F" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
-  <text x="890" y="254" font-size="12" fill="#6E7781">committed state</text>
+  <rect x="560" y="240" width="400" height="64" rx="10" fill="#DDE8FF" stroke="#7FA6EE"/>
+  <text x="760" y="278" font-size="15" font-weight="700" text-anchor="middle" fill="#1F2328">Workers (read-only)</text>
+  <path d="M 880 172 L 880 234" stroke="#8C959F" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <text x="890" y="208" font-size="12" fill="#6E7781">commits</text>
 
-  <!-- Reliability note -->
-  <text x="40" y="290" font-size="14" font-weight="600" fill="#8C7A4B">SAFE TO RETRY</text>
-  <g font-size="13" fill="#57606A">
-    <text x="40" y="316">Every request carries a transaction ID and a</text>
-    <text x="40" y="336">sequence number. A retried request gets the</text>
-    <text x="40" y="356">driver's saved response back instead of running</text>
-    <text x="40" y="376">again, so a lost reply never inserts a row twice.</text>
-  </g>
+  <rect x="40" y="240" width="200" height="64" rx="10" fill="#FBE9E4" stroke="#E8957A"/>
+  <text x="140" y="268" font-size="14" font-weight="700" text-anchor="middle" fill="#1F2328">Safe to retry</text>
+  <text x="140" y="288" font-size="12" text-anchor="middle" fill="#57606A">replayed, not rerun</text>
 </svg>
