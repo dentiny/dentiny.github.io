@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" width="1000" height="520" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <rect width="1000" height="520" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">Two ways to split a Join, neither of which needs a shuffle</text>
+
+  <!-- Left: split one, replicate the rest -->
+  <rect x="40" y="76" width="440" height="410" rx="14" fill="none" stroke="#B9B2A0" stroke-dasharray="7 6"/>
+  <text x="60" y="102" font-size="14" font-weight="600" fill="#8C7A4B">SPLIT THE BIGGEST, REPLICATE THE REST</text>
+  <text x="60" y="124" font-size="13" fill="#57606A">lineitem JOIN part: every task reads all of part</text>
+
+  <g font-size="12" text-anchor="middle" fill="#1F2328">
+    <text x="80" y="160" text-anchor="start" font-weight="600">lineitem</text>
+    <rect x="160" y="146" width="96" height="22" rx="4" fill="#DDE8FF" stroke="#7FA6EE"/><text x="208" y="161">RG 0-3</text>
+    <rect x="262" y="146" width="96" height="22" rx="4" fill="#FFE1D6" stroke="#E8957A"/><text x="310" y="161">RG 4-7</text>
+    <rect x="364" y="146" width="96" height="22" rx="4" fill="#E8DDFF" stroke="#A88BE6"/><text x="412" y="161">RG 8-11</text>
+    <text x="80" y="200" text-anchor="start" font-weight="600">part</text>
+    <rect x="160" y="186" width="300" height="22" rx="4" fill="#F3F1EA" stroke="#D8D3C4"/><text x="310" y="201">all row groups</text>
+  </g>
+  <g font-size="12" text-anchor="middle">
+    <rect x="70" y="240" width="124" height="70" rx="8" fill="#DDE8FF" stroke="#7FA6EE"/>
+    <text x="132" y="262" font-weight="700" fill="#1F2328">Task 1</text>
+    <text x="132" y="280" fill="#57606A">RG 0-3</text>
+    <text x="132" y="296" fill="#57606A">+ all of part</text>
+    <rect x="198" y="240" width="124" height="70" rx="8" fill="#FFE1D6" stroke="#E8957A"/>
+    <text x="260" y="262" font-weight="700" fill="#1F2328">Task 2</text>
+    <text x="260" y="280" fill="#57606A">RG 4-7</text>
+    <text x="260" y="296" fill="#57606A">+ all of part</text>
+    <rect x="326" y="240" width="124" height="70" rx="8" fill="#E8DDFF" stroke="#A88BE6"/>
+    <text x="388" y="262" font-weight="700" fill="#1F2328">Task 3</text>
+    <text x="388" y="280" fill="#57606A">RG 8-11</text>
+    <text x="388" y="296" fill="#57606A">+ all of part</text>
+  </g>
+  <g font-size="13" fill="#57606A">
+    <text x="70" y="346">Like a broadcast Join, but no one broadcasts:</text>
+    <text x="70" y="366">each worker reads the small side from the bucket.</text>
+    <text x="70" y="398" font-weight="600" fill="#1F2328">Works for any equality key.</text>
+    <text x="70" y="418">Costs one full read of every replicated table</text>
+    <text x="70" y="438">per task, so the cost model decides if it pays.</text>
+  </g>
+
+  <!-- Right: co-partition by key ranges -->
+  <rect x="520" y="76" width="440" height="410" rx="14" fill="none" stroke="#B9B2A0" stroke-dasharray="7 6"/>
+  <text x="540" y="102" font-size="14" font-weight="600" fill="#8C7A4B">CO-PARTITION BY KEY RANGES</text>
+  <text x="540" y="124" font-size="13" fill="#57606A">lineitem JOIN orders ON orderkey: both are ordered on it</text>
+
+  <g font-size="12" text-anchor="middle" fill="#1F2328">
+    <text x="560" y="160" text-anchor="start" font-weight="600">lineitem</text>
+    <rect x="640" y="146" width="96" height="22" rx="4" fill="#DDE8FF" stroke="#7FA6EE"/><text x="688" y="161">key &lt; 20M</text>
+    <rect x="742" y="146" width="96" height="22" rx="4" fill="#FFE1D6" stroke="#E8957A"/><text x="790" y="161">20M-40M</text>
+    <rect x="844" y="146" width="96" height="22" rx="4" fill="#E8DDFF" stroke="#A88BE6"/><text x="892" y="161">key &#8805; 40M</text>
+    <text x="560" y="200" text-anchor="start" font-weight="600">orders</text>
+    <rect x="640" y="186" width="96" height="22" rx="4" fill="#DDE8FF" stroke="#7FA6EE"/><text x="688" y="201">key &lt; 20M</text>
+    <rect x="742" y="186" width="96" height="22" rx="4" fill="#FFE1D6" stroke="#E8957A"/><text x="790" y="201">20M-40M</text>
+    <rect x="844" y="186" width="96" height="22" rx="4" fill="#E8DDFF" stroke="#A88BE6"/><text x="892" y="201">key &#8805; 40M</text>
+  </g>
+  <g font-size="12" text-anchor="middle">
+    <rect x="550" y="240" width="124" height="70" rx="8" fill="#DDE8FF" stroke="#7FA6EE"/>
+    <text x="612" y="262" font-weight="700" fill="#1F2328">Task 1</text>
+    <text x="612" y="280" fill="#57606A">both sides,</text>
+    <text x="612" y="296" fill="#57606A">key &lt; 20M</text>
+    <rect x="678" y="240" width="124" height="70" rx="8" fill="#FFE1D6" stroke="#E8957A"/>
+    <text x="740" y="262" font-weight="700" fill="#1F2328">Task 2</text>
+    <text x="740" y="280" fill="#57606A">both sides,</text>
+    <text x="740" y="296" fill="#57606A">20M-40M</text>
+    <rect x="806" y="240" width="124" height="70" rx="8" fill="#E8DDFF" stroke="#A88BE6"/>
+    <text x="868" y="262" font-weight="700" fill="#1F2328">Task 3</text>
+    <text x="868" y="280" fill="#57606A">both sides,</text>
+    <text x="868" y="296" fill="#57606A">key &#8805; 40M</text>
+  </g>
+  <g font-size="13" fill="#57606A">
+    <text x="550" y="346">Row group min/max statistics say which row groups</text>
+    <text x="550" y="366">hold which keys, so equal keys meet in one task.</text>
+    <text x="550" y="398" font-weight="600" fill="#1F2328">Nothing is read twice, and outer Joins work too.</text>
+    <text x="550" y="418">Needs row groups ordered on the key, and an</text>
+    <text x="550" y="438">integer, decimal or date/time key.</text>
+  </g>
+</svg>
