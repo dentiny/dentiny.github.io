@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" width="1000" height="420" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8C959F"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="420" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">One writer, many readers</text>
+
+  <!-- Writer -->
+  <rect x="40" y="80" width="220" height="64" rx="10" fill="#FBE9E4" stroke="#E8957A" stroke-width="2"/>
+  <text x="150" y="108" font-size="15" font-weight="700" text-anchor="middle" fill="#1F2328">Writer client</text>
+  <text x="150" y="128" font-size="12" text-anchor="middle" fill="#57606A">exactly one</text>
+  <rect x="40" y="160" width="220" height="40" rx="10" fill="none" stroke="#C9A6A6" stroke-dasharray="5 4"/>
+  <text x="150" y="185" font-size="12" text-anchor="middle" fill="#B4553F">second writer: rejected</text>
+
+  <!-- Readers -->
+  <g font-size="15" font-weight="700" text-anchor="middle" fill="#1F2328">
+    <rect x="40" y="240" width="220" height="44" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/><text x="150" y="267">Reader 1</text>
+    <rect x="40" y="292" width="220" height="44" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/><text x="150" y="319">Reader 2</text>
+    <rect x="40" y="344" width="220" height="44" rx="10" fill="#F3F1EA" stroke="#D8D3C4"/><text x="150" y="371">Reader N</text>
+  </g>
+
+  <!-- Driver -->
+  <rect x="360" y="80" width="260" height="308" rx="14" fill="#FFF1C2" stroke="#E3B341"/>
+  <text x="490" y="110" font-size="17" font-weight="700" text-anchor="middle" fill="#1F2328">Driver</text>
+  <rect x="380" y="128" width="220" height="56" rx="8" fill="#FFFDF7" stroke="#E8957A"/>
+  <text x="490" y="152" font-size="14" font-weight="600" text-anchor="middle" fill="#1F2328">writes</text>
+  <text x="490" y="171" font-size="12" text-anchor="middle" fill="#57606A">runs locally</text>
+  <rect x="380" y="264" width="220" height="56" rx="8" fill="#FFFDF7" stroke="#7FA6EE"/>
+  <text x="490" y="288" font-size="14" font-weight="600" text-anchor="middle" fill="#1F2328">reads</text>
+  <text x="490" y="307" font-size="12" text-anchor="middle" fill="#57606A">split across workers</text>
+
+  <g stroke="#8C959F" stroke-width="2" fill="none" marker-end="url(#arrow)">
+    <path d="M 262 112 L 374 150"/>
+    <path d="M 262 262 L 374 286"/>
+    <path d="M 262 314 L 374 292"/>
+    <path d="M 262 366 L 374 298"/>
+  </g>
+
+  <!-- Workers -->
+  <g font-size="15" font-weight="700" text-anchor="middle" fill="#1F2328">
+    <rect x="700" y="240" width="120" height="44" rx="10" fill="#DDE8FF" stroke="#7FA6EE"/><text x="760" y="267">Worker</text>
+    <rect x="840" y="240" width="120" height="44" rx="10" fill="#DDE8FF" stroke="#7FA6EE"/><text x="900" y="267">Worker</text>
+  </g>
+  <path d="M 602 292 C 650 292, 660 262, 694 262" stroke="#8C959F" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Bucket -->
+  <rect x="700" y="80" width="260" height="104" rx="14" fill="#E3F4E6" stroke="#7CC08A"/>
+  <text x="830" y="138" font-size="17" font-weight="700" text-anchor="middle" fill="#1F2328">Bucket</text>
+  <path d="M 602 156 L 694 132" stroke="#8C959F" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <text x="648" y="130" font-size="12" text-anchor="middle" fill="#6E7781">commit</text>
+  <g stroke="#8C959F" stroke-width="2" fill="none" marker-end="url(#arrow)">
+    <path d="M 760 238 L 760 190"/>
+    <path d="M 900 238 L 900 190"/>
+  </g>
+  <text x="830" y="218" font-size="12" text-anchor="middle" fill="#6E7781">read</text>
+</svg>

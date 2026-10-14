@@ -60,6 +60,18 @@ SELECT o_orderstatus, sum(o_totalprice), avg(o_totalprice) FROM dh.orders GROUP 
 
 The client forwards its S3 secret to the driver, and the driver passes it on to the workers with each task.
 
+### One writer, many readers
+
+Note the two `ATTACH` statements above: they're the most important rule of the system. **Each database has exactly one writer and any number of readers.**
+
+![One writer client sends its statements to the driver, which runs them locally and commits them to the bucket; a second writer is rejected. Any number of reader clients send queries to the same driver, which splits them across workers that read the bucket.](/assets/images/duckherder/one-writer.svg)
+
+- **The writer** attaches without `READ_ONLY`. All of its statements, reads included, run on the driver, inside its own transaction. The driver rejects a second writable client for the same database.
+- **Readers** attach with `READ_ONLY`, from as many machines as you like. Only their queries are split across workers.
+- **Readers see commits.** Workers follow the bucket's committed state and never see a half-written transaction. They can lag a recent commit, by default by about 10 seconds; the roadmap covers how to close that gap.
+
+This rule is what keeps the rest simple. With one writer there's nothing to coordinate between nodes: no distributed locks, no two-phase commit, no conflicting writes to merge. Everything else in Duckherder is about spreading the reads.
+
 Here's one read query from start to finish. The rest of the post zooms into each step.
 
 ![A sequence diagram with four lifelines: client, driver, workers and bucket. 1: the client sends the whole SELECT as SQL. 2: the driver binds and optimizes it, cuts a fragment and writes one plan per task. 3: it sends each worker a serialized plan with a rowid range, build ID and storage config. 4: each worker attaches the database read-only on its first task and reads only its task's blocks. 5: workers run the fragment. 6: they return partial results as Arrow batches. 7: the driver merges them, runs the operators above the fragment, and streams the final result to the client.](/assets/images/duckherder/query-lifecycle.svg)
