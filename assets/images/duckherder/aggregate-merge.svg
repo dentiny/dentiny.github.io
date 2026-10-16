@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 380" width="1000" height="380" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <rect width="1000" height="380" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">Merging partial aggregates exactly</text>
+
+  <g font-size="14" font-weight="700" fill="#1F2328">
+    <rect x="40" y="70" width="280" height="40" rx="6" fill="#F3F1EA" stroke="#D8D3C4"/><text x="56" y="96">Query</text>
+    <rect x="330" y="70" width="300" height="40" rx="6" fill="#DDE8FF" stroke="#7FA6EE"/><text x="346" y="96">Worker</text>
+    <rect x="640" y="70" width="320" height="40" rx="6" fill="#FFF1C2" stroke="#E3B341"/><text x="656" y="96">Driver</text>
+  </g>
+  <g font-size="13" font-family="Menlo, monospace" fill="#1F2328">
+    <text x="56" y="142">sum / min / max</text>
+    <text x="346" y="142">same</text>
+    <text x="656" y="142">same</text>
+    <line x1="40" y1="160" x2="960" y2="160" stroke="#E6E1D3"/>
+    <text x="56" y="190">count</text>
+    <text x="346" y="190">count</text>
+    <text x="656" y="190">sum</text>
+    <line x1="40" y1="208" x2="960" y2="208" stroke="#E6E1D3"/>
+    <text x="56" y="238">avg</text>
+    <text x="346" y="238">sum, count</text>
+    <text x="656" y="238">sum / sum</text>
+    <line x1="40" y1="256" x2="960" y2="256" stroke="#E6E1D3"/>
+    <text x="56" y="286">count(DISTINCT)</text>
+    <text x="346" y="286">distinct values</text>
+    <text x="656" y="286">count(DISTINCT)</text>
+  </g>
+  <rect x="40" y="312" width="920" height="44" rx="8" fill="#FBE9E4" stroke="#E8957A"/>
+  <text x="56" y="340" font-size="14" fill="#1F2328"><tspan font-weight="700">Stays local:</tspan> DOUBLE avg, string_agg, ROLLUP, ...</text>
+</svg>

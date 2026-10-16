@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 740" width="1000" height="740" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#3B4350" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arrow-back" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#4A86E8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <!-- DuckDB mark -->
+    <symbol id="duck" viewBox="-20 -20 40 40">
+      <circle r="20" fill="#000"/>
+      <circle cx="-4" r="9" fill="#FFF100"/>
+      <rect x="6.5" y="-3" width="7" height="6" rx="3" fill="#FFF100"/>
+    </symbol>
+    <!-- S3 bucket -->
+    <symbol id="bucket" viewBox="0 0 60 64">
+      <g fill="none" stroke="#3FA142" stroke-width="3" stroke-linejoin="round">
+        <ellipse cx="28" cy="10" rx="24" ry="7"/>
+        <path d="M 4 10 L 10 56 Q 28 64 46 56 L 52 10"/>
+        <path d="M 22 24 C 34 30, 48 36, 56 34" stroke-linecap="round"/>
+      </g>
+      <circle cx="22" cy="24" r="3" fill="#3FA142"/>
+    </symbol>
+  </defs>
+
+  <rect width="1000" height="740" rx="16" fill="#FFFFFF"/>
+
+  <!-- Nothing else -->
+  <text x="40" y="52" font-size="15" font-weight="700" letter-spacing="1.2" fill="#8C7A4B">NOTHING ELSE</text>
+  <g font-size="15" fill="#57606A">
+    <text x="40" y="80">No catalog service</text>
+    <text x="40" y="102">No JVM or Spark</text>
+  </g>
+
+  <!-- Clients -->
+  <g font-size="19" fill="#1F2328">
+    <rect x="250" y="30" width="230" height="74" rx="10" fill="#F1F2F4" stroke="#3B4350" stroke-width="2"/>
+    <use href="#duck" x="268" y="47" width="40" height="40"/>
+    <text x="322" y="63" font-weight="600">Writer client</text>
+    <text x="322" y="86" font-size="15" fill="#57606A">at most one</text>
+
+    <rect x="520" y="30" width="230" height="74" rx="10" fill="#F1F2F4" stroke="#3B4350" stroke-width="2"/>
+    <use href="#duck" x="538" y="47" width="40" height="40"/>
+    <text x="592" y="63" font-weight="600">Reader clients</text>
+    <text x="592" y="86" font-size="15" fill="#57606A">any number</text>
+  </g>
+
+  <!-- Client <-> driver -->
+  <g stroke-width="2" fill="none">
+    <path d="M 355 108 L 355 176" stroke="#3B4350" marker-end="url(#arrow)"/>
+    <path d="M 380 176 L 380 108" stroke="#4A86E8" stroke-dasharray="2 5" stroke-linecap="round" marker-end="url(#arrow-back)"/>
+    <path d="M 625 108 L 625 176" stroke="#3B4350" marker-end="url(#arrow)"/>
+    <path d="M 650 176 L 650 108" stroke="#4A86E8" stroke-dasharray="2 5" stroke-linecap="round" marker-end="url(#arrow-back)"/>
+  </g>
+  <text x="343" y="148" font-size="17" fill="#3B4350" text-anchor="end">SQL</text>
+
+  <!-- Arrow Flight wordmark -->
+  <g transform="translate(676 128)" fill="#1F2328">
+    <text x="0" y="-2" font-size="9" font-weight="600" letter-spacing="0.6">APACHE</text>
+    <text x="0" y="22" font-size="23" font-weight="800" letter-spacing="-0.5">ARROW</text>
+    <g transform="translate(86 3)">
+      <path d="M 0 0 L 9 0 L 20 11 L 9 22 L 0 22 L 11 11 Z"/>
+      <path d="M 13 0 L 22 0 L 33 11 L 22 22 L 13 22 L 24 11 Z"/>
+      <path d="M 26 0 L 35 0 L 46 11 L 35 22 L 26 22 L 37 11 Z"/>
+    </g>
+    <text x="142" y="21" font-size="20" font-weight="700">Flight</text>
+  </g>
+
+  <!-- Driver -->
+  <rect x="250" y="180" width="500" height="150" rx="12" fill="#F1F2F4" stroke="#3B4350" stroke-width="2"/>
+  <use href="#duck" x="430" y="194" width="40" height="40"/>
+  <text x="482" y="222" font-size="21" font-weight="600" fill="#1F2328">Driver</text>
+  <g font-size="16" font-weight="600" text-anchor="middle" fill="#1F2328">
+    <rect x="266" y="256" width="150" height="54" rx="8" fill="#FFFFFF" stroke="#B6BCC6"/><text x="341" y="289">Only writer</text>
+    <rect x="425" y="256" width="150" height="54" rx="8" fill="#FFFFFF" stroke="#B6BCC6"/><text x="500" y="289">Plans tasks</text>
+    <rect x="584" y="256" width="150" height="54" rx="8" fill="#FFFFFF" stroke="#B6BCC6"/><text x="659" y="289">Merges results</text>
+  </g>
+
+  <!-- Driver <-> workers: plans down, Arrow batches back -->
+  <g stroke-width="2" fill="none">
+    <path d="M 420 334 L 205 424" stroke="#3B4350" marker-end="url(#arrow)"/>
+    <path d="M 235 424 L 445 334" stroke="#4A86E8" stroke-dasharray="2 5" stroke-linecap="round" marker-end="url(#arrow-back)"/>
+    <path d="M 488 334 L 488 424" stroke="#3B4350" marker-end="url(#arrow)"/>
+    <path d="M 512 424 L 512 334" stroke="#4A86E8" stroke-dasharray="2 5" stroke-linecap="round" marker-end="url(#arrow-back)"/>
+    <path d="M 580 334 L 795 424" stroke="#3B4350" marker-end="url(#arrow)"/>
+    <path d="M 765 424 L 555 334" stroke="#4A86E8" stroke-dasharray="2 5" stroke-linecap="round" marker-end="url(#arrow-back)"/>
+  </g>
+  <text x="262" y="372" font-size="16" fill="#3B4350" text-anchor="end">serialized plans</text>
+  <text x="738" y="372" font-size="16" fill="#4A86E8">Arrow batches</text>
+
+  <!-- Workers -->
+  <g font-size="19" font-weight="600" fill="#1F2328">
+    <rect x="80" y="428" width="250" height="70" rx="10" fill="#F1F2F4" stroke="#3B4350" stroke-width="2"/>
+    <use href="#duck" x="102" y="443" width="40" height="40"/>
+    <text x="156" y="470">Worker 1</text>
+    <rect x="375" y="428" width="250" height="70" rx="10" fill="#F1F2F4" stroke="#3B4350" stroke-width="2"/>
+    <use href="#duck" x="397" y="443" width="40" height="40"/>
+    <text x="451" y="470">Worker 2</text>
+    <rect x="670" y="428" width="250" height="70" rx="10" fill="#F1F2F4" stroke="#3B4350" stroke-width="2"/>
+    <use href="#duck" x="692" y="443" width="40" height="40"/>
+    <text x="746" y="470">Worker N</text>
+  </g>
+  <g fill="#3B4350">
+    <circle cx="637" cy="463" r="3"/><circle cx="647" cy="463" r="3"/><circle cx="657" cy="463" r="3"/>
+  </g>
+  <text x="807" y="544" font-size="16" fill="#57606A">stateless, read-only</text>
+
+  <!-- Workers read the bucket -->
+  <g stroke="#3B4350" stroke-width="2" fill="none" marker-end="url(#arrow)">
+    <path d="M 205 502 L 205 572"/>
+    <path d="M 500 502 L 500 572"/>
+    <path d="M 795 502 L 795 572"/>
+  </g>
+  <text x="215" y="544" font-size="16" fill="#3B4350">reads</text>
+
+  <!-- Driver writes the bucket -->
+  <path d="M 246 255 L 40 255 L 40 650 L 72 650" stroke="#3B4350" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <text x="143" y="245" font-size="16" fill="#3B4350" text-anchor="middle">writes</text>
+
+  <!-- Bucket -->
+  <rect x="80" y="578" width="840" height="140" rx="14" fill="none" stroke="#3B4350" stroke-width="2" stroke-dasharray="8 6"/>
+  <use href="#bucket" x="112" y="600" width="60" height="64"/>
+  <text x="142" y="696" font-size="16" fill="#1F2328" text-anchor="middle">S3</text>
+  <text x="212" y="640" font-size="19" font-weight="600" fill="#1F2328">Bucket</text>
+  <text x="212" y="664" font-size="15" fill="#57606A">the only shared state</text>
+  <g font-size="17" font-weight="600" text-anchor="middle" fill="#1F2328">
+    <rect x="400" y="612" width="235" height="72" rx="10" fill="#E3F4E6" stroke="#7CC08A" stroke-width="1.5"/><text x="517" y="654">Storage cache</text>
+    <rect x="655" y="612" width="235" height="72" rx="10" fill="#E3F4E6" stroke="#7CC08A" stroke-width="1.5"/><text x="772" y="654">Query cache</text>
+  </g>
+</svg>

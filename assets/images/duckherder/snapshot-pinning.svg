@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 380" width="1000" height="380" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8C959F"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="380" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">Next: one commit per query</text>
+
+  <!-- Timeline -->
+  <line x1="60" y1="110" x2="940" y2="110" stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)"/>
+  <g font-size="12" text-anchor="middle" fill="#1F2328">
+    <circle cx="200" cy="110" r="8" fill="#E3F4E6" stroke="#7CC08A" stroke-width="2"/><text x="200" y="92">commit 41</text>
+    <circle cx="520" cy="110" r="8" fill="#E3F4E6" stroke="#7CC08A" stroke-width="2"/><text x="520" y="92">commit 42</text>
+    <line x1="640" y1="98" x2="640" y2="122" stroke="#E3B341" stroke-width="3"/><text x="640" y="140" font-weight="700">query</text>
+  </g>
+
+  <!-- Today -->
+  <rect x="40" y="166" width="440" height="180" rx="14" fill="none" stroke="#B9B2A0" stroke-dasharray="7 6"/>
+  <text x="60" y="192" font-size="14" font-weight="600" fill="#8C7A4B">TODAY</text>
+  <g font-size="13">
+    <rect x="70" y="208" width="380" height="36" rx="8" fill="#DDE8FF" stroke="#7FA6EE"/><text x="86" y="231" fill="#1F2328">Worker 1: reads 42</text>
+    <rect x="70" y="252" width="380" height="36" rx="8" fill="#FBE9E4" stroke="#E8957A"/><text x="86" y="275" fill="#1F2328">Worker 2: reads 41 (stale)</text>
+    <rect x="70" y="296" width="380" height="36" rx="8" fill="#DDE8FF" stroke="#7FA6EE"/><text x="86" y="319" fill="#1F2328">Worker 3: reads 42</text>
+  </g>
+
+  <!-- Pinned -->
+  <rect x="520" y="166" width="440" height="180" rx="14" fill="none" stroke="#B9B2A0" stroke-dasharray="7 6"/>
+  <text x="540" y="192" font-size="14" font-weight="600" fill="#8C7A4B">PINNED</text>
+  <rect x="550" y="208" width="380" height="40" rx="8" fill="#FFF1C2" stroke="#E3B341"/>
+  <text x="740" y="233" font-size="13" text-anchor="middle" font-weight="700" fill="#1F2328">Driver pins commit 42</text>
+  <g font-size="13" text-anchor="middle">
+    <rect x="550" y="276" width="116" height="40" rx="8" fill="#DDE8FF" stroke="#7FA6EE"/><text x="608" y="301" fill="#1F2328">reads 42</text>
+    <rect x="682" y="276" width="116" height="40" rx="8" fill="#DDE8FF" stroke="#7FA6EE"/><text x="740" y="301" fill="#1F2328">reads 42</text>
+    <rect x="814" y="276" width="116" height="40" rx="8" fill="#DDE8FF" stroke="#7FA6EE"/><text x="872" y="301" fill="#1F2328">reads 42</text>
+  </g>
+</svg>

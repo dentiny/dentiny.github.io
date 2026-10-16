@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" width="1000" height="300" font-family="Inter, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8C959F"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="300" rx="16" fill="#FFFDF7"/>
+  <text x="40" y="46" font-size="20" font-weight="700" fill="#1F2328">Shipping plans instead of SQL</text>
+
+  <!-- Driver steps -->
+  <text x="40" y="86" font-size="14" font-weight="600" fill="#8C7A4B">DRIVER</text>
+  <g font-size="14" font-weight="700" text-anchor="middle" fill="#1F2328">
+    <rect x="40" y="98" width="210" height="50" rx="8" fill="#FFF1C2" stroke="#E3B341"/><text x="145" y="128">Copy fragment</text>
+    <rect x="276" y="98" width="210" height="50" rx="8" fill="#FFF1C2" stroke="#E3B341"/><text x="381" y="128">Pin columns</text>
+    <rect x="512" y="98" width="210" height="50" rx="8" fill="#FFF1C2" stroke="#E3B341"/><text x="617" y="128">Add task range</text>
+    <rect x="748" y="98" width="212" height="50" rx="8" fill="#FFF1C2" stroke="#E3B341"/><text x="854" y="128">Serialize</text>
+  </g>
+  <g stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)">
+    <line x1="252" y1="123" x2="270" y2="123"/>
+    <line x1="488" y1="123" x2="506" y2="123"/>
+    <line x1="724" y1="123" x2="742" y2="123"/>
+  </g>
+  <path d="M 854 150 L 854 200" stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Worker steps -->
+  <text x="40" y="196" font-size="14" font-weight="600" fill="#3E63B8">WORKER</text>
+  <g font-size="14" font-weight="700" text-anchor="middle" fill="#1F2328">
+    <rect x="748" y="206" width="212" height="50" rx="8" fill="#DDE8FF" stroke="#7FA6EE"/><text x="854" y="236">Check build ID</text>
+    <rect x="512" y="206" width="210" height="50" rx="8" fill="#DDE8FF" stroke="#7FA6EE"/><text x="617" y="236">Deserialize</text>
+    <rect x="276" y="206" width="210" height="50" rx="8" fill="#DDE8FF" stroke="#7FA6EE"/><text x="381" y="236">Optimize</text>
+    <rect x="40" y="206" width="210" height="50" rx="8" fill="#DDE8FF" stroke="#7FA6EE"/><text x="145" y="236">Execute</text>
+  </g>
+  <g stroke="#8C959F" stroke-width="2" marker-end="url(#arrow)">
+    <line x1="746" y1="231" x2="728" y2="231"/>
+    <line x1="510" y1="231" x2="492" y2="231"/>
+    <line x1="274" y1="231" x2="256" y2="231"/>
+  </g>
+</svg>
