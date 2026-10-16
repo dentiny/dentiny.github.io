@@ -18,11 +18,11 @@ tags: [DuckDB, Distributed Systems, Object Storage]
 - **Nothing to deploy but DuckDB.** The client, driver and workers are DuckDB processes with extensions loaded. There's no Spark or JVM, and no catalog service or metastore database.
 - **Storage and compute are separate.** The data is a native DuckDB database in object storage, written through [`duckdb_object_storage`](/posts/duckdb-on-object-storage/). Workers attach it read-only, so nothing gets copied, sharded or rebalanced.
 - **One writer, many readers.** Writes go to the driver's single read-write attachment, and DuckDB's own storage engine writes them to the bucket. Reads from read-only attachments are split across workers.
-- **The driver ships DuckDB plans, not SQL.** An optimizer extension cuts fragments out of DuckDB's logical plan, splits them by row group, and merges partial results exactly. Small queries never fan out.
-- **Joins are distributed without a shuffle.** The driver either splits the biggest table and lets every worker read the small ones, or co-partitions tables that are ordered on the Join key. A cost model decides whether splitting pays off.
-- **It's honest about speed.** On TPC-H SF10 with simulated S3 latency, single-table queries ran 1.4× faster with three workers. Those numbers predate Join distribution; a rerun is next.
+- **Complex queries run distributed, not just scans.** The driver cuts fragments out of DuckDB's optimized logical plan and ships them serialized, not as SQL, so inner, outer, semi, anti and mark Joins, correlated subqueries and CTEs can run on the workers, with partial aggregates merged exactly. Small queries never fan out.
+- **Joins are distributed too.** Shared storage lets every worker read the small tables itself, and tables ordered on the Join key are split by key range. A cost model decides whether splitting pays off.
+- **Up to 2.8× faster with three workers.** On TPC-H SF10 with simulated S3 latency, 18 of 22 queries ran on the workers, the fastest came close to the 3× ideal, and the whole suite ran 2.15× faster.
 
-It's a personal project, experimental, and not affiliated with DuckDB Labs.
+It's a personal project, not affiliated with DuckDB Labs.
 
 ## The question I couldn't stop asking
 
@@ -210,11 +210,20 @@ A distributed benchmark is easy to fool yourself with, so the setup is mostly ab
 
 Here's SF10 on an i7-12700K. Each DuckDB process gets two threads of one performance core and 4 GiB, and RustFS gets the four efficiency cores:
 
-![TPC-H SF10, cold start, with and without simulated S3 latency, 0 workers versus 3 workers. Q1 and Q6 drop from about 29 and 30 seconds to about 20 and 21 seconds with simulated latency; other queries are unchanged.](/assets/images/duckherder/tpch-sf10-cold.png)
+![TPC-H SF10 query times with simulated S3 latency, cold start, for 0, 1 and 3 workers. With 3 workers most queries drop to about a third of their time, from 2.51× for Q9 to 2.83× for Q3. Q2, Q13, Q20 and Q22 are unchanged, Q11 gains 1.32×, Q16 1.15× and Q17 1.28×. One worker takes as long as none.](/assets/images/duckherder/tpch-sf10-cold.png)
 
-These numbers are from before Joins were distributed, so only the two single-table queries, Q1 and Q6, ran on the workers. With simulated latency, they went from 28.8 s to 20.0 s and from 29.9 s to 21.1 s, about 1.4× faster with three workers. Without it, they gained 1.4× and 1.25×. Every other query ran on the driver and stayed within noise. That's the honest starting point: correct results, a real speedup where the work was split, and far from the 3× ideal. Finding where the rest goes is the next job.
+With simulated latency, 18 of the 22 queries ran on the workers; Q2, Q13, Q20 and Q22 stayed on the driver. Most of the 18 came within 10% of the 3× ideal, from 2.51× for Q9 to 2.83× for Q3, and the whole suite went from 778.9 s to 363.1 s, 2.15× faster. A few gained less: Q10 at 2.13×, Q11 at 1.32× and Q17 at 1.28×. With one worker, which gets the same two CPUs as the driver, every query took as long as with none, so shipping plans and returning results costs little next to the work itself.
 
-Two more things stand out. Simulated latency makes everything about 12× slower, so for a cold workload object storage is the bottleneck, not CPU. That's why caching matters as much as distribution. And now that Joins split, the other 20 queries can finally move. Rerunning this benchmark is the first item below.
+![TPC-H SF10 query times without simulated latency, cold start, for 0, 1 and 3 workers. With 3 workers most split queries gain 1.2× to 1.7×. Q11, Q16 and Q17 get slower, at 0.53×, 0.57× and 0.70×.](/assets/images/duckherder/tpch-sf10-cold-no-latency.png)
+
+| Total time, all 22 queries | 0 workers | 1 worker | 3 workers | Speedup |
+| --- | ---: | ---: | ---: | ---: |
+| With simulated S3 latency | 778.9 s | 782.1 s | 363.1 s | 2.15× |
+| Without latency | 65.0 s | 65.1 s | 50.6 s | 1.29× |
+
+Without latency the gain shrinks to 1.29× overall, and three queries got slower. Q11 and Q16 finish in under half a second on one node, so the fixed cost of fanning out outweighs the split, and Q17 went from 3.1 s to 4.5 s. Those are the cases the fan-out decision and the cost model should catch next.
+
+One more thing stands out. Simulated latency makes everything about 12× slower, so for a cold workload object storage is the bottleneck, not CPU. That's why caching matters as much as distribution.
 
 ## What's next
 
